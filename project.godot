@@ -12,6 +12,7 @@ config_version=5
 
 config/name="TestRunner"
 config/description="I wanted a test running script and interface to use when testing my projects, and so this is what I have."
+config/tags=PackedStringArray("addon", "enetheru")
 run/main_scene="uid://tgkrbc3pgve8"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="uid://3mp4878ru2lc"
