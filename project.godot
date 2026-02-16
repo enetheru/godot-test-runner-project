@@ -28,4 +28,4 @@ gdscript/warnings/return_value_discarded=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/test_runner/plugin.cfg")
+enabled=PackedStringArray("res://addons/enetheru.test-runner/plugin.cfg")
