@@ -1,6 +1,11 @@
 @tool
 extends TestBase
 
-# This test should succeed
+## Never emitted. The max-runtime timer has to finish this run.
+signal _stuck
+
+
+# This test should time out.
 func _run_test() -> RetCode:
-	return RetCode.TEST_FAILED
+	await _stuck
+	return RetCode.TEST_OK
