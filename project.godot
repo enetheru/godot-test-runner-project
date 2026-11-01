@@ -39,6 +39,8 @@ enabled=PackedStringArray("res://addons/enetheru.command-server/plugin.cfg", "re
 
 [plugin]
 
-test_runner/verbose=false
-test_runner/debug=false
-test_runner/tracy=false
+test_runner/verbose=true
+test_runner/debug=true
+test_runner/tracy=true
+test_runner/tracy_capture="C:/git/wolfpld/tracy/capture/cmake-build-release-visual-studio/tracy-capture.exe"
+test_runner/tracy_scripts="C:/Godot/src/godot-private/misc/scripts/tracy"
