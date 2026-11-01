@@ -1,0 +1,8 @@
+[submodule "addons/enetheru.test-runner"]
+	path = addons/enetheru.test-runner
+	url = git@github.com:enetheru/godot-test-runner.git
+	branch = main
+[submodule "addons/enetheru.command-server"]
+	path = addons/enetheru.command-server
+	url = git@github.com:enetheru/godot-command-server.git
+	branch = master
