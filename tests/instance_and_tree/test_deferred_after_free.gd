@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## A deferred call runs on the next idle, after the node it closed over was freed.
 ##

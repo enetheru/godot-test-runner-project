@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## [method Node.queue_free] leaves the node in the tree until the frame flushes.
 ##

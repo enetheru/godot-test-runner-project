@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## The body returns while a worker is still blocked. Cleanup is what joins it.
 ##

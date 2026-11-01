@@ -1,7 +1,7 @@
 @tool
-extends TracyCapture
+extends TestBase
 
-## One timeline mark under [TracyCapture].
+## One timeline mark. The capture is on only when the host installed it.
 ##
 ## The trace is this script's name plus [code].tracy[/code], in this folder.
 

@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## The body pushes an editor toast after the runner has left the host's flush.
 ##

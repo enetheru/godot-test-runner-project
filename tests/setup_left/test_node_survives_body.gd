@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## Setup parents a node to the root. The body never releases it.
 ##

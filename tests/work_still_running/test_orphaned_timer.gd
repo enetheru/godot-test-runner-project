@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## A timer armed in the body fires after cleanup has freed the node.
 ##

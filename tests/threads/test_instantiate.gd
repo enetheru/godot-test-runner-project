@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## Instantiate one detached [PackedScene] off the main thread.
 ##

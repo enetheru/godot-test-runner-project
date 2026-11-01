@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## The body parks on a signal nobody emits. The cap ends the run.
 ##
@@ -11,7 +11,7 @@ signal _never
 
 
 func _setup() -> Error:
-	# [TracyCapture] arms a long cap before this. This run wants the short one.
+	# The capture pre-hook arms a long cap before this when it is installed. This run wants the short one.
 	max_runtime_s = 0.4
 	_profiler_message("cap: setup set")
 	return OK

@@ -1,5 +1,5 @@
 @tool
-extends TracyCapture
+extends TestBase
 
 ## A failing check runs, then the body returns the pass value.
 ##
