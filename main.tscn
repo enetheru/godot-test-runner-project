@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://tgkrbc3pgve8"]
+[gd_scene format=3 uid="uid://tgkrbc3pgve8"]
 
 [ext_resource type="PackedScene" uid="uid://cp6632s1ekh6i" path="res://addons/enetheru.test-runner/main_panel.tscn" id="1_ig7tw"]
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=1141136600]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1988582624]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,5 +18,5 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TestRunner" parent="VBoxContainer" instance=ExtResource("1_ig7tw")]
+[node name="TestRunner" parent="VBoxContainer" unique_id=1686022309 instance=ExtResource("1_ig7tw")]
 layout_mode = 2
