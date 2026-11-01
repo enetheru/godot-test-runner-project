@@ -28,7 +28,7 @@ Open the TestRunner main screen. The tree lists `res://tests`. The row button, t
 
 `process_test` picks the class from `Engine.is_editor_hint()`. While a scene is playing, the editor dock stays in editor hint, so Run on the dock stays on `TestBase`. While `res://tests/Threads/off_thread.tscn` was playing, an editor script still reported hint true and that scene path.
 
-`PlayBase` is the branch when `process_test` itself runs with the hint false. `re_write` skips the first three lines, writes `{name}_alt.gd` extending `PlayBase`, parents that node, awaits `run_test`, and deletes the alt file. Play `res://addons/enetheru.test-runner/main_panel.tscn` and use the row button or Run. A played scene that instanced that panel and awaited `process_test` on the cmpdef row wrote `hint false`, then `process_test`, then `returned`.
+`PlayBase` is the branch when `process_test` itself runs with the hint false. `re_write` skips the first three lines, writes `{name}_alt.gd` extending `PlayBase`, parents that node, awaits `run_test`, and deletes the alt file. Play `res://addons/enetheru.test-runner/ui/main_panel.tscn` and use the row button or Run. A played scene that instanced that panel and awaited `process_test` on the cmpdef row wrote `hint false`, then `process_test`, then `returned`.
 
 Debug > Customize Run Instances... has multiple instances enabled, and the count is 2. The editor stores that under `debug_options` as `multiple_instances_enabled` and `run_instance_count`. Embed on play is off, so one Play press starts two processes. A scene whose `_ready` calls `process_test` enters the runner once in each copy. The marker from that check held the sequence twice.
 

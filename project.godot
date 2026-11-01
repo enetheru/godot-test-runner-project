@@ -36,3 +36,9 @@ gdscript/warnings/return_value_discarded=1
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/enetheru.command-server/plugin.cfg", "res://addons/enetheru.test-runner/plugin.cfg")
+
+[plugin]
+
+test_runner/verbose=false
+test_runner/debug=false
+test_runner/tracy=false
