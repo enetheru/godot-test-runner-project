@@ -92,9 +92,9 @@ The panel reads `runcode`. On a pass it also looks for the substring `warn` in t
 
 ### The log is bbcode
 
-`logp` and the assertion failures store bbcode and print it with `print_rich`. The panel shows that array in a rich-text label. The command reply includes the print. A colored print put a control character into that reply, and the caller could not parse the JSON. When `_verbose` or `_debug` is set, `_run_test_body` reduces `output` to one string and drops the string. The lines that do appear are the ones `logp` already wrote.
+`logp` and the assertion failures store bbcode and print it with `print_rich`. The panel shows that array in a rich-text label. The command reply includes the print. A colored print put a control character into that reply, and the caller could not parse the JSON. When the info bit is open, `_run_test_body` reduces `output` to one string and drops the string. The lines that do appear are the ones `logp` already wrote.
 
-`_verbose` defaults true on `TestBase`, so File > Run prints. The panel copies its checkbox into the instance, and that checkbox defaults false, so a panel run stays quiet until Verbose is on.
+`local_lvl` defaults to notice, so File > Run stays quiet. The panel copies its level into the instance. Info, debug, and trace open the harness lines.
 
 ## The session
 
@@ -106,7 +106,7 @@ The class comes from `Engine.is_editor_hint()`. The tests that need a live world
 
 `process_selection` calls `process_test` and does not wait, so Run starts every selected file and returns. Those coroutines interleave on the main thread and share its tree, its autoloads, and its files. Two overlapping play runs of one file share one `{name}_alt.gd`. `_run_batch_parallel` is that same unjoined start on the service. The panel never calls it. A test that leaves a node, a setting, or a profiler flag behind leaves it for the next test.
 
-`run_test_base` and `run_play_base` do the same three steps: copy `_verbose` and `_debug`, await `run_test`, copy `runcode` and `output`. In `_run_one`, an instance that is neither `TestBase` nor an object with `run_test` returns before the later branch that reports `run_test` missing.
+`run_test_base` and `run_play_base` do the same three steps: copy `local_lvl`, await `run_test`, copy `runcode` and `output`. In `_run_one`, an instance that is neither `TestBase` nor an object with `run_test` returns before the later branch that reports `run_test` missing.
 
 ## Idle
 
