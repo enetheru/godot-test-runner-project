@@ -6,7 +6,7 @@ extends TestBase
 ## The scene is a bare [Node]. The trace is this script's name plus
 ## [code].tracy[/code], in this folder.
 
-const _SCENE:PackedScene = preload("res://tests/threads/off_thread.tscn")
+const _SCENE:PackedScene = preload("res://tests/test_runner/threads/off_thread.tscn")
 
 var _is_main:bool = false
 var _thread:Thread
