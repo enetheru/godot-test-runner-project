@@ -10,9 +10,11 @@ extends TestBase
 signal _never
 
 
+func _configure() -> void:
+	harness_time_s = 0.4
+
+
 func _setup() -> Error:
-	# The capture pre-hook arms a long cap before this when it is installed. This run wants the short one.
-	max_runtime_s = 0.4
 	_profiler_message("cap: setup set")
 	return OK
 
