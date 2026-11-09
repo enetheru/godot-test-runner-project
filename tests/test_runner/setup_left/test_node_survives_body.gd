@@ -38,7 +38,8 @@ func _cleanup() -> Error:
 
 
 func _mark(step:String) -> void:
-	if not _order.append(step):
+	# append returns the error. OK is 0, so false means the step was stored.
+	if _order.append(step):
 		TEST_TRUE(false, "mark stored " + step)
 		return
 	_profiler_message(step)
