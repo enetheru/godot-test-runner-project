@@ -126,7 +126,7 @@ Nothing preloads `run_headless.gd`. `test_dir` and `fbs_dir` are unread. The sch
 
 `u32`, `u32_`, `u64`, and `u64_` have no reader. `sbytes` repeats `Enetheru.string.sbytes`. `bytes_view` returns `sbytes`. Nothing in the addon or under `res://tests` calls either. `TestResult.path` is never assigned.
 
-Filters and Folder call empty functions. Help opens a popup whose text is `Help Documentation`. The script fields for the buttons, the popup, `info_list`, and `info_scroller` are never read. The scene connections are what those controls use. The banner functions, such as `_________IMPORTS_________`, return immediately and nothing calls them. They exist so the script outline has headings.
+A Filter label sits ahead of the glob box above the test list. A bare word matches anywhere in the row name. Scan folders are tests_dir and cases_dir on the Options resource. Help loads ui/help.md into a popup. The script fields for the buttons, the popup, `info_list`, and `info_scroller` are never read. The scene connections are what those controls use. The banner functions, such as `_________IMPORTS_________`, return immediately and nothing calls them. They exist so the script outline has headings.
 
 ## What a change disturbs
 
