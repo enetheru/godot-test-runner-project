@@ -10,7 +10,7 @@ extends TR_Case
 const BUDGET_S := 9.0
 
 
-class Probe extends TR_Hooks:
+class Probe extends TR_Hook:
 	var saw_pre: bool = false
 	var sink: TR_CaseSession
 
