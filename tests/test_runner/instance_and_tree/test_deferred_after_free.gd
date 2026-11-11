@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## A deferred call runs on the next idle, after the node it closed over was freed.
 ##

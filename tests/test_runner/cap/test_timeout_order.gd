@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## The body parks on a signal nobody emits. The cap ends the run.
 ##

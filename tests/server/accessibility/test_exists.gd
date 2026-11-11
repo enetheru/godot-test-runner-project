@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## AccessibilityServer is registered on the engine.
 

@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Never emitted. The max-runtime timer has to finish this run.
 signal _stuck

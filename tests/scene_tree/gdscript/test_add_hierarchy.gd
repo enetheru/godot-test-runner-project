@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Setup builds a detached tree. The body adds that tree's root.
 ## Each node carries [code]node_callbacks.gd[/code].

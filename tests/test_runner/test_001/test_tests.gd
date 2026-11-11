@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 # This test should Succeed
 func _run_test() -> int:

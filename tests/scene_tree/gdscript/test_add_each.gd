@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Setup builds detached nodes. The body adds each one to the scene root.
 ## Each node carries [code]node_callbacks.gd[/code].

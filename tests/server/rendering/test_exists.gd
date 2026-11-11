@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## RenderingServer is registered on the engine.
 

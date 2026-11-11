@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## The body pushes an editor toast after the runner has left the host's flush.
 ##

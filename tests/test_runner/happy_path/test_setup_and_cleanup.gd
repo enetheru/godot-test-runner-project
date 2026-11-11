@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Setup parents a node, the body uses it, and cleanup frees it.
 

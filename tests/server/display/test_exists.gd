@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## DisplayServer is registered on the engine.
 

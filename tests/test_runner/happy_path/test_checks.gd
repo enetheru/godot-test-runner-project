@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Passing checks. Return [member runcode] so a failed check stays failed.
 

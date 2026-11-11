@@ -1,5 +1,5 @@
 @tool
-extends Case
+extends TR_Case
 
 ## Configure replaces the budget and installs hooks.
 ##
@@ -10,9 +10,9 @@ extends Case
 const BUDGET_S := 9.0
 
 
-class Probe extends RunHooks:
+class Probe extends TR_Hooks:
 	var saw_pre: bool = false
-	var sink: CaseSession
+	var sink: TR_CaseSession
 
 
 	func pre() -> Error:

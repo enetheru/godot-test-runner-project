@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## A timer armed in the body fires after cleanup has freed the node.
 ##

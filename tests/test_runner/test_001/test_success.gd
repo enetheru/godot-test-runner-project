@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 # This test should succeed
 func _run_test() -> RetCode:

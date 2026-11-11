@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## A body may await. This one resumes on the next frame and then passes.
 

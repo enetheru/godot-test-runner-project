@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Instantiate one detached [PackedScene] off the main thread.
 ##

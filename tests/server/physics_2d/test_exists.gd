@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## PhysicsServer2D is registered on the engine.
 

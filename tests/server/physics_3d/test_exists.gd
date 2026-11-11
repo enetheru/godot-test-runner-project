@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## PhysicsServer3D is registered on the engine.
 

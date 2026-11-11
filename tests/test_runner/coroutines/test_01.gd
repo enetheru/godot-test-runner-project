@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Override this function to perform setup prior to testing.
 func _setup() -> Error:

@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Same body as tests/scene_tree/gdscript/test_add_hierarchy.gd.
 ## The tree and the add_child live in SceneTreeAddHierarchy.

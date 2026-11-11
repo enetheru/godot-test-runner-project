@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Setup parents a node to the root. The body never releases it.
 ##

@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## A failing check runs, then the body returns the pass value.
 ##

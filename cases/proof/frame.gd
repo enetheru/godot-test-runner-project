@@ -1,5 +1,5 @@
 @tool
-extends Case
+extends TR_Case
 
 ## One frame on a scene tree. The script host refuses this before the body.
 

@@ -1,5 +1,5 @@
 @tool
-extends Case
+extends TR_Case
 
 ## A value check. No tree.
 

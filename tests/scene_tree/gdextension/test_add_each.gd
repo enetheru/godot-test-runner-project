@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## Same body as tests/scene_tree/gdscript/test_add_each.gd.
 ## The nodes and the add_child loop live in SceneTreeAddEach.

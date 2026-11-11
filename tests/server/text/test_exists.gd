@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## The primary TextServer is installed. TextServer itself is not a singleton.
 

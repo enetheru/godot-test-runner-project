@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## [method Node.queue_free] leaves the node in the tree until the frame flushes.
 ##

@@ -1,5 +1,5 @@
 @tool
-extends TestBase
+extends TR_Base
 
 ## The body returns while a worker is still blocked. Cleanup is what joins it.
 ##
