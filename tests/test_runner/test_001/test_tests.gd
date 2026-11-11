@@ -2,6 +2,9 @@
 extends TR_Base
 
 # This test should Succeed
+
+const DESCRIPTION: String = "Passing checks for true, equal, and comparison."
+
 func _run_test() -> int:
 	TEST_TRUE( true )
 

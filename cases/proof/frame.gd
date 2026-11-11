@@ -3,6 +3,8 @@ extends TR_Case
 
 ## One frame on a scene tree. The script host refuses this before the body.
 
+const DESCRIPTION: String = "One frame on a scene tree. The script host refuses this before the body."
+
 const NEEDS_TREE := true
 
 

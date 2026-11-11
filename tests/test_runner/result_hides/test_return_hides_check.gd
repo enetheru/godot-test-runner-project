@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## A failing check runs, then the body returns the pass value.
+
+const DESCRIPTION: String = "A failing check runs, then the body returns the pass value."
 ##
 ## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## The marks stay in order: before the check, after the check, the pass return.

@@ -3,6 +3,8 @@ extends TR_Base
 
 ## Passing checks. Return [member runcode] so a failed check stays failed.
 
+const DESCRIPTION: String = "Passing checks. Return runcode so a failed check stays failed."
+
 func _run_test() -> RetCode:
 	TEST_TRUE(1 + 1 == 2, "arithmetic")
 	TEST_FALSE(1 == 2, "not equal")

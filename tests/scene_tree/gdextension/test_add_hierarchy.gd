@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## Same body as tests/scene_tree/gdscript/test_add_hierarchy.gd.
+
+const DESCRIPTION: String = "Same body as the GDScript hierarchy test. The tree and the add_child live in SceneTreeAddHierarchy."
 ## The tree and the add_child live in SceneTreeAddHierarchy.
 
 const _COUNT:int = 256

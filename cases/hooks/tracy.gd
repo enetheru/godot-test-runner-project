@@ -7,6 +7,8 @@ extends TR_Case
 ## for a capture and the tools are configured. A skipped capture leaves
 ## hooks empty.
 
+const DESCRIPTION: String = "Tracy on a scene tree. The script host refuses this before the body. Hooks stay empty. The session assigns TracyCapture when this run asks for a capture and the tools are configured. A skipped capture leaves hooks empty."
+
 const NEEDS_TREE := true
 
 const TracyCapture = preload( "uid://c38qii7m273x0" )

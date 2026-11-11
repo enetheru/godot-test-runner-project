@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## The body returns while a worker is still blocked. Cleanup is what joins it.
+
+const DESCRIPTION: String = "The body returns while a worker is still blocked. Cleanup is what joins it."
 ##
 ## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## The worker does not call into the tree. The marks are all on the main thread.

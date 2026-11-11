@@ -3,6 +3,8 @@ extends TR_Base
 
 ## Setup parents a node, the body uses it, and cleanup frees it.
 
+const DESCRIPTION: String = "Setup parents a node, the body uses it, and cleanup frees it."
+
 var _node:Node
 
 

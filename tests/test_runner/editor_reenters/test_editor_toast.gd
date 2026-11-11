@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## The body pushes an editor toast after the runner has left the host's flush.
+
+const DESCRIPTION: String = "The body pushes an editor toast after the runner has left the host's flush."
 ##
 ## This build has no script-visible [EditorProgress]. [EditorToaster] is the
 ## editor call the body can make instead. The trace is this script's name, the

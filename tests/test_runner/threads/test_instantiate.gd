@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## Instantiate one detached [PackedScene] off the main thread.
+
+const DESCRIPTION: String = "Instantiate one detached scene off the main thread."
 ##
 ## The scene is a bare [Node]. The trace is this script's name, the run kind,
 ## and [code].tracy[/code], in this folder.

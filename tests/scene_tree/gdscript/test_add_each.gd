@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## Setup builds detached nodes. The body adds each one to the scene root.
+
+const DESCRIPTION: String = "Setup builds detached nodes. The body adds each one to the scene root."
 ## Each node carries [code]node_callbacks.gd[/code].
 
 const _Callbacks:GDScript = preload("res://tests/scene_tree/gdscript/node_callbacks.gd")

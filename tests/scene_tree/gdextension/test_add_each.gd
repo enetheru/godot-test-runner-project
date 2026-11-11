@@ -2,6 +2,8 @@
 extends TR_Base
 
 ## Same body as tests/scene_tree/gdscript/test_add_each.gd.
+
+const DESCRIPTION: String = "Same body as the GDScript add-each test. The nodes and the add_child loop live in SceneTreeAddEach."
 ## The nodes and the add_child loop live in SceneTreeAddEach.
 
 const _COUNT:int = 256

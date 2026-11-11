@@ -2,6 +2,9 @@
 extends TR_Base
 
 ## Override this function to perform setup prior to testing.
+
+const DESCRIPTION: String = "Await a signal, a function state, and a plain value."
+
 func _setup() -> Error:
 	#OS.delay_usec(100)
 	return OK

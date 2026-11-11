@@ -3,6 +3,8 @@ extends TR_Case
 
 ## A value check. No tree.
 
+const DESCRIPTION: String = "A value check. No tree."
+
 
 #      ██████  ██    ██ ███████ ██████  ██████  ██ ██████  ███████ ███████     #
 #     ██    ██ ██    ██ ██      ██   ██ ██   ██ ██ ██   ██ ██      ██          #

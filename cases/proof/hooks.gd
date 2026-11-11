@@ -7,6 +7,8 @@ extends TR_Case
 ## is the value configure replaces.
 
 
+const DESCRIPTION: String = "Configure replaces the budget and installs hooks. Pre runs before the body. Post appends an output line. BUDGET_S is the value configure replaces."
+
 const BUDGET_S := 9.0
 
 
