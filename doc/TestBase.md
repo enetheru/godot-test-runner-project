@@ -112,11 +112,11 @@ The live hosts leave these unused. This list is the rest.
 
 Nothing references `scripts/main_panel.gd`. That copy scans one directory level and applies `test_folder_filter`. The live panel still declares `default_folder_filter` and `test_folder_filter`, and `collect_tests` never calls them.
 
-Nothing preloads `run_headless.gd`. `test_dir` and `fbs_dir` are unread. The schema pass stores an empty dictionary and then prints it as a result. The script starts `_run` on a `Thread` and reads `retcode`. The field on the test is `runcode`, and the run is an `await` on the main thread. `Shared.collect_tests` and `flatten_test_tree` have this file as their only caller.
+Nothing preloads `run_headless.gd`. `test_dir` and `fbs_dir` are unread. The schema pass stores an empty dictionary and then prints it as a result. The script starts `_run` on a `Thread` and reads `retcode`. The field on the test is `runcode`, and the run is an `await` on the main thread. The live list walk is `test_scan.collect_test_tree`, which the panel calls from `collect_tests`.
 
 ### Scanner
 
-`schema_file_filter` accepts every filename. The panel omits a schema filter, so the scan fills `schema_files` and `_test_def_from_node` drops that key. The service passes an empty `Callable`, and its scan skips schemas. `Shared.folder_filter` is never read. The service `default_folder_filter` returns true for every folder, and `collect_groups` still passes it. `Shared` extends `EditorScript` and defines no `_run`. Callers preload it for `RetCode`, `TestDef`, and the static scan.
+`test_scan.gd` returns each folder as `name`, `folder_path`, `test_scripts`, and `children`. The panel and the service call `collect_test_tree`. The service passes `default_folder_filter`, which accepts every folder. `RetCode` and `reducer_to_lines` are members of `TR_Base`. `TestDef` and `TestResult` live in `ui/test_rows.gd`.
 
 ### Helpers and controls
 
