@@ -1,8 +1,8 @@
 # Test base
 
-`TestBase` exists so one test file can run as an editor script, from the test panel, inside a running game, and on its own. The hosts do not call it the same way. The extra layers are the adaptations between them: a self-pin, a deferred body, a timeout that gives up on the body, a second class for play mode, and a rewrite of the test's header.
+`TestBase` exists so one test file can run as an editor script, from the test panel, inside a running game, and on its own. The hosts do not call it the same way. The extra layers are the adaptations between them: a self-pin, a deferred body, and a timeout that gives up on the body.
 
-This note reads `addons/enetheru.test-runner` as it stands. Nothing in it is a decision. The hosts are how a run is started. The run is what `run_test` does after that. The second class, the result value, and the shared session are where one test comes to mean two things. Idle code is what those paths leave unused. The last part is what a change makes stale, and one smaller shape, offered as a sketch.
+This note reads `addons/enetheru.test-runner` as it stands. Nothing in it is a decision. The hosts are how a run is started. The run is what `run_test` does after that. The result value and the shared session are where one test comes to mean two things. Idle code is what those paths leave unused. The last part is what a change makes stale, and one smaller shape, offered as a sketch.
 
 ## Hosts
 
@@ -26,9 +26,9 @@ Open the TestRunner main screen. The tree lists `res://tests`. The row button, t
 
 ### Running game
 
-`process_test` picks the class from `Engine.is_editor_hint()`. While a scene is playing, the editor dock stays in editor hint, so Run on the dock stays on `TestBase`. While `res://tests/Threads/off_thread.tscn` was playing, an editor script still reported hint true and that scene path.
+While a scene is playing, the editor dock stays in editor hint. Run on that dock calls `process_test` on the script in the tree. While `res://tests/Threads/off_thread.tscn` was playing, an editor script still reported hint true and that scene path.
 
-`PlayBase` is the branch when `process_test` itself runs with the hint false. `re_write` skips the first three lines, writes `{name}_alt.gd` extending `PlayBase`, parents that node, awaits `run_test`, and deletes the alt file. Play `res://addons/enetheru.test-runner/ui/main_panel.tscn` and use the row button or Run. A played scene that instanced that panel and awaited `process_test` on the cmpdef row wrote `hint false`, then `process_test`, then `returned`.
+When `process_test` itself runs with the hint false, it loads that same script. A case goes through the session with the play host. An editor-script test is constructed, and `run_test_base` awaits `run_harness`. The tree comes from the main loop: `_ensure_scene_tree` uses the editor base only while the hint is true and the display is not headless. Play `res://addons/enetheru.test-runner/ui/main_panel.tscn` and use the row button or Run.
 
 Debug > Customize Run Instances... has multiple instances enabled, and the count is 2. The editor stores that under `debug_options` as `multiple_instances_enabled` and `run_instance_count`. Embed on play is off, so one Play press starts two processes. A scene whose `_ready` calls `process_test` enters the runner once in each copy. The marker from that check held the sequence twice.
 
@@ -58,21 +58,17 @@ The rule that this stay on the main thread is an `assert` of `Thread.is_main_thr
 
 `_cleanup` runs on the second fiber, after `_run_test` returns, and only when `test_finished` has not already been emitted. The OK or FAILED line is logged before it. A failing cleanup can still flip `runcode` to failed. The timeout logs, emits `test_finished`, and leaves the parked `_run_test` in place. When that await later resumes, the body throws the result away and skips `_cleanup`.
 
-`test_finished` is the only completion signal. `_finish_run` emits it, stops the timer, and ignores a second call. On the success path the order is cleanup, then the signal, then the waiter. On the timeout path the signal fires while `_run_test` is still parked. `_run` then drops `cycleref`. The service drops `_keep` at the same moment. The play node is `queue_free`d when `run_play_base` returns. The service `free`s a non-`RefCounted` instance then. An `EditorScript` lasts until its last reference goes, and on the timeout path the caller's reference goes at the signal.
+`test_finished` is the only completion signal. `_finish_run` emits it, stops the timer, and ignores a second call. On the success path the order is cleanup, then the signal, then the waiter. On the timeout path the signal fires while `_run_test` is still parked. `_run` then drops `cycleref`. The service drops `_keep` at the same moment. The panel holds that same `EditorScript` in a local until `run_harness` returns, in the editor and in a game. The object lasts until its last reference goes, and on the timeout path the caller's reference goes at the signal.
 
 What has to stay true is small. The body has to be able to `await`. A parked `await` has to be unable to wedge the panel, the service, or File > Run. The deadline is a `Timer`, so both hosts have to provide a `SceneTree`. The test author writes `_setup`, `_run_test`, and `_cleanup`.
 
-## The second class
+## The same class
 
-`PlayBase` is not a subclass. `scripts/rewrite.gd` copies `TestBase.gd` into `PlayBase_generated.gd`, replaces the header with `extends Node`, and strips a leading `EditorInterface.get_base_control().` from any line that has one. Nothing calls that generator. The strip looks for the call on the same line. The helper calls `get_base_control()` and then `base.call`, so the strip matches no current line. The rewrite that does run is `main_panel.re_write`, and that one only replaces the three-line header.
+The panel runs the file on disk. In the editor and in a game, `process_test` constructs that script and `run_test_base` awaits `run_harness`. `_run` and `cycleref` remain the File > Run pin. The panel leaves them alone.
 
-The copy has drifted. It still checks `OS.get_thread_caller_id()` against the main thread, where `TestBase` checks `Thread.is_main_thread()`. It assigns `scene_tree` from `get_tree()`, then from the main loop, where `TestBase` goes through `_ensure_scene_tree`. Regenerating from today's `TestBase` would compile the editor lookup into the play class, behind `Engine.is_editor_hint()`, and play would fall through to the main loop. Until that generator is run, the two files are maintained by hand.
+`_ensure_scene_tree` reads the editor base while the hint is true and the display is not headless. In a game it takes the main loop when that loop is a `SceneTree`.
 
-`_run` and `cycleref` on `PlayBase` are the editor-script pin, copied onto a `Node`. Play and the service call `run_test`. A `Node` has no File > Run entry, so those two members stay idle.
-
-The header rewrite assumes line one is `@tool`, line two is `extends`, and line three is blank. A test that extends something other than `TestBase` loses that base in play. `TracyCapture` is that case: the play alt extends `PlayBase`, so the capture wrapper is gone. A `class_name` or any other line in the first three is discarded with them.
-
-`TracyCapture` sits beside `TestBase` in the addon. Its `run_test` arms a capture, calls `TestBase.run_test`, then saves. It wraps from the outside because `_setup` and `_cleanup` belong to the test, and because they do not bracket the run. The capture turns the profiler off before `tracy-capture` connects, and `set_enabled` applies on a later frame mark. A test that runs in that gap records nothing.
+`TracyCapture` sits beside `TestBase` in the addon. `install` assigns it to `hooks` when that field is empty. `pre` turns the profiler off before `tracy-capture` connects, and `set_enabled` applies on a later frame mark. A test that runs in that gap records nothing. The hook stays on the instance, so the `extends` line in the test file is the class the panel constructs.
 
 ## The result
 
@@ -100,17 +96,17 @@ The panel reads `runcode`. On a pass it also looks for the substring `warn` in t
 
 ### Which host a test thinks it is
 
-The class comes from `Engine.is_editor_hint()`. The tests that need a live world check `self is Node` instead. Hint, the rewritten header, and `is Node` are three readings of one run. The tree is filled by the filename prefix `test`, ending in `.gd`, and skipping `_generated.gd`. The panel and the service each declare that predicate. `example/example.gd` extends `TestBase` and the tree never lists it. `example/test_strategy.gd` is the only user of `TestStrategy`, and it sits in the same place.
+The class is the script on disk in the editor and in a game. Hint is true in the editor process and false while a game is running. The tree is filled by the filename prefix `test`, ending in `.gd`, and skipping `_generated.gd`. The panel and the service each declare that predicate. `example/example.gd` extends `TestBase` and the tree never lists it. `example/test_strategy.gd` is the only user of `TestStrategy`, and it sits in the same place.
 
 ### Many tests, one process
 
-`process_selection` calls `process_test` and does not wait, so Run starts every selected file and returns. Those coroutines interleave on the main thread and share its tree, its autoloads, and its files. Two overlapping play runs of one file share one `{name}_alt.gd`. `_run_batch_parallel` is that same unjoined start on the service. The panel never calls it. A test that leaves a node, a setting, or a profiler flag behind leaves it for the next test.
+`process_selection` calls `process_test` and does not wait, so Run starts every selected file and returns. Those coroutines interleave on the main thread and share its tree, its autoloads, and its files. `_run_batch_parallel` is that same unjoined start on the service. The panel never calls it. A test that leaves a node, a setting, or a profiler flag behind leaves it for the next test.
 
-`run_test_base` and `run_play_base` do the same three steps: copy `local_lvl`, await `run_test`, copy `runcode` and `output`. In `_run_one`, an instance that is neither `TestBase` nor an object with `run_test` returns before the later branch that reports `run_test` missing.
+`run_test_base` copies `local_lvl`, awaits `run_harness`, and copies `runcode` and `output`. In `_run_one`, an instance that is neither `TestBase` nor an object with `run_test` returns before the later branch that reports `run_test` missing.
 
 ## Idle
 
-The live hosts leave these unused. The second class is already described above. This list is the rest.
+The live hosts leave these unused. This list is the rest.
 
 ### Old panel and old batch
 
@@ -130,28 +126,28 @@ A Filter label sits ahead of the glob box above the test list. A bare word match
 
 ## What a change disturbs
 
-The copy is the root. A change to the run, the result, or the signal has to land in `TestBase` and in `PlayBase`, and the play file goes stale again the way it already has. Two ways through that: one class, parented by the panel in the editor and in the game, with File > Run reduced to a wrapper that parents it and waits; or both classes, with `PlayBase` regenerated after every edit to `TestBase`.
+The run lives in `TestBase`. A change to the run, the result, or the signal lands in that class. The panel already constructs it in the editor and in a game. File > Run still enters `_run` on that same object.
 
-After one class, re-read `TracyCapture`, because play currently strips it. Re-read the tests that branch on `self is Node`. Re-read the File > Run pin, `RUN_SCRIPT` returning before the await, the flush `EditorProgress` refuses, and the scene-tree lookup. That change leaves the result numbers, the log text, the filename scan, and the shared session where they are. It retires `PlayBase_generated.gd`, `scripts/rewrite.gd`, and the shared `_alt.gd` path.
+Capture is hooks on the instance, so a play run keeps the trace the file asked for. Re-read the File > Run pin, `RUN_SCRIPT` returning before the await, the flush `EditorProgress` refuses, and the scene-tree lookup. That leaves the result numbers, the log text, the filename scan, and the shared session where they are.
 
 The result value comes after there is one implementation. Changing which int means pass means re-reading every `return runcode`, every `if not TEST_*_RET`, the panel's `as RetCode`, the service's `== TEST_OK`, `TracyCapture`'s writes to `runcode`, and saved results where 1 means pass. Making `run_test` return the outcome, instead of leaving it in fields, is that same set of readers plus `_timed_out`.
 
 Status comes before the log text. Once the panel and the service read a status field, a later change away from bbcode and `print_rich` leaves status alone. Changing the log first means rebuilding the `warn` sniff and the `Timeout was reached` sniff.
 
-The signal is in the same place as the result: both copies, until there is one. After `test_finished` means the body has returned and `_cleanup` has run, re-read a setup failure, the timeout path, `cycleref`, `_keep`, `queue_free`, `free`, and `TracyCapture`'s await of `run_test`. A body that never awaits a cancel still needs a backstop, and that backstop is the case where cleanup cannot run, because the body is still using what cleanup would release.
+The signal and the result live on that class. After `test_finished` means the body has returned and `_cleanup` has run, re-read a setup failure, the timeout path, `cycleref`, `_keep`, `queue_free`, `free`, and `TracyCapture`'s await of `run_test`. A body that never awaits a cancel still needs a backstop, and that backstop is the case where cleanup cannot run, because the body is still using what cleanup would release.
 
-Joining the batch is its own change. After `process_selection` waits, re-read `_run_batch_parallel`, which claims to match the unjoined UI, and re-read a `_setup` that still has no timer. The filename scan is independent. After it keys off `TestBase`, re-read `example/`, any helper whose name starts with `test`, and the `_generated` and `_alt` exclusions.
+Joining the batch is its own change. After `process_selection` waits, re-read `_run_batch_parallel`, which claims to match the unjoined UI, and re-read a `_setup` that still has no timer. The filename scan is independent. After it keys off `TestBase`, re-read `example/`, any helper whose name starts with `test`, and the `_generated.gd` skip.
 
 `scripts/main_panel.gd`, `run_headless.gd`, `collect_tests`, `flatten_test_tree`, the unused constants, and `sbytes` have no live caller. The thread `assert` needs another look only if `run_test` itself starts being called off the main thread.
 
 ## One class
 
-One `Node` can be the test. The panel parents it to the editor tree. Play mode parents the same class to the game tree. File > Run stays a short `EditorScript` whose only job is to parent that node and wait. `_ensure_scene_tree`, `PlayBase`, and the three-line rewrite then have nothing to do. A capture wrapper on the test class survives play mode because the header is no longer replaced.
+The panel already runs this `EditorScript` in the editor and in a game. One `Node` can still be the test. The panel would parent it to the editor tree, and play would parent that same class to the game tree. File > Run would stay a short `EditorScript` whose only job is to parent that node and wait. `_ensure_scene_tree` would then have nothing to do. A capture hook already stays with the instance in play, because the panel runs the file on disk.
 
-That sketch does not put cleanup beside setup. The timer can move to a cancel the body is already awaiting. `test_finished` then means one thing. A second class does not fix the timeout. A third signal is not required either. The current signal is doing both jobs, and the timeout fires the one that drops the caller's pin.
+That sketch does not put cleanup beside setup. The timer can move to a cancel the body is already awaiting. `test_finished` then means one thing. The current signal is doing both jobs, and the timeout fires the one that drops the caller's pin.
 
 Standalone `-s` stays out. The engine will not run an editor script, or this node, without a main loop. The editor and the game already are that loop. A bare script process is a different host, and `run_headless.gd` is not it.
 
 ## Still unread
 
-These would add edges, and this note does not cover them yet. Who reads `user://test_runner_results`, and which of those readers treat `retcode` 1 as success. What an `@tool` load and a second `TESTS_RUN` do to the editor. What a test is allowed to leave on the root, in an autoload, in the profiler, or on disk. Whether the export plugin ships the runner, `PlayBase`, or `res://tests`.
+These would add edges, and this note does not cover them yet. Who reads `user://test_runner_results`, and which of those readers treat `retcode` 1 as success. What an `@tool` load and a second `TESTS_RUN` do to the editor. What a test is allowed to leave on the root, in an autoload, in the profiler, or on disk. Whether the export plugin ships the runner, or `res://tests`.

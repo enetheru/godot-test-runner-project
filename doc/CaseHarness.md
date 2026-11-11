@@ -2,7 +2,7 @@
 
 Sketch for review. Nothing here is a change to the runner yet. It replaces the "One class" sketch in [TestBase.md](TestBase.md) if it is accepted. That sketch makes the test file the node. This one keeps the test file as the case. The session is shared. The clock is the part that changes when the process has no tree.
 
-The copy is what failed. `scripts/rewrite.gd` turns `TestBase.gd` into `PlayBase_generated.gd` by replacing the header and hoping editor calls sit on the same line. `main_panel.re_write` then skips the first three lines of each test and writes `{name}_alt.gd` extending `PlayBase`. The generated class drifted: its thread check and its scene-tree lookup no longer match `TestBase`. The three-line splice also drops anything that is not `extends TestBase`, including a capture wrapper and a `class_name`. `tests/test_runner/test_001/test_assert_fail_alt.gd` is one of those splices, and it still extends `PlayBase`.
+The panel runs the script on disk. A case goes through the session. An editor-script test is constructed as itself, and `run_test_base` awaits `run_harness`, in the editor and in a game. `test_assert_fail` is the one assert-fail source, and it stays on the flavours that keep `assert`.
 
 ## Terms
 
@@ -106,7 +106,7 @@ The existing `@tool` scripts stay on `TestBase` through the proof. They still ru
 6. Run the value case on `template_release`.
 7. Only after the proof list has been seen, choose the first existing folder to migrate. `tests/test_runner/happy_path` is the likely one, because `test_checks.gd` matches the value case and `test_await_frame.gd` matches the frame case.
 8. Point `tests/scene_tree/gdextension` at a native class name and delete the handwritten adapter bodies.
-9. Retire `scripts/rewrite.gd`, `main_panel.re_write`, the `_alt.gd` path, and `test_assert_fail_alt.gd`. The assert-fail case remains the one source file, limited to flavours that keep `assert`.
+9. Done. `test_assert_fail` remains the one source file, limited to flavours that keep `assert`.
 
 ## Recommendation
 
