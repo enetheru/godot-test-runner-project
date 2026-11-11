@@ -3,7 +3,7 @@ extends TR_Base
 
 ## A failing check runs, then the body returns the pass value.
 ##
-## The trace is this script's name plus [code].tracy[/code], in this folder.
+## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## The marks stay in order: before the check, after the check, the pass return.
 ## The host stores that return. The planted check is in the output either way.
 

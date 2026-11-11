@@ -3,7 +3,7 @@ extends TR_Base
 
 ## A timer armed in the body fires after cleanup has freed the node.
 ##
-## The trace is this script's name plus [code].tracy[/code], in this folder.
+## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## Marks: body arms, body returns, cleanup frees, the late timer, cleanup sees it.
 
 var _node:Node

@@ -3,7 +3,7 @@ extends TR_Base
 
 ## A deferred call runs on the next idle, after the node it closed over was freed.
 ##
-## The trace is this script's name plus [code].tracy[/code], in this folder.
+## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## The callable is not bound to the node, so the flush still runs and can see the free.
 
 var _order:PackedStringArray = PackedStringArray()

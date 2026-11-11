@@ -3,7 +3,7 @@ extends TR_Base
 
 ## [method Node.queue_free] leaves the node in the tree until the frame flushes.
 ##
-## The trace is this script's name plus [code].tracy[/code], in this folder.
+## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## The next look on this same frame still finds it. The look after one frame does not.
 
 const _NAME := "suite_same_frame"

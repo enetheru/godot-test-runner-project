@@ -4,8 +4,8 @@ extends TR_Base
 ## The body pushes an editor toast after the runner has left the host's flush.
 ##
 ## This build has no script-visible [EditorProgress]. [EditorToaster] is the
-## editor call the body can make instead. The trace is this script's name plus
-## [code].tracy[/code], in this folder. The marks bracket [method EditorToaster.push_toast].
+## editor call the body can make instead. The trace is this script's name, the
+## run kind, and [code].tracy[/code], in this folder. The marks bracket [method EditorToaster.push_toast].
 
 var _order:PackedStringArray = PackedStringArray()
 

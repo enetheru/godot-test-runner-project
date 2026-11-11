@@ -3,7 +3,7 @@ extends TR_Base
 
 ## Setup parents a node to the root. The body never releases it.
 ##
-## The trace is this script's name plus [code].tracy[/code], in this folder.
+## The trace is this script's name, the run kind, and [code].tracy[/code], in this folder.
 ## Cleanup is the first place that notices, and then it frees the node.
 
 var _node:Node
