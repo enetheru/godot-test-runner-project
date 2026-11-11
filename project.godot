@@ -40,7 +40,7 @@ enabled=PackedStringArray("res://addons/enetheru.command-server/plugin.cfg", "re
 
 test_runner/Logging/lvl=0
 test_runner/Discovery/tests_dir="res://tests"
-test_runner/Discovery/cases_dir="res://cases"
+test_runner/Discovery/cases_dirs=PackedStringArray("res://cases/hooks", "res://cases/proof")
 test_runner/Tracy/tracy=false
 test_runner/Tracy/python_exe="C:/Users/nicho/AppData/Local/Programs/Python/Python314/python.exe"
 test_runner/Tracy/Capture/capture="C:/git/wolfpld/tracy/capture/cmake-build-release-visual-studio/tracy-capture.exe"
