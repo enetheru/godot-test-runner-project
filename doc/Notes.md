@@ -1,0 +1,17 @@
+## 2026-11-12
+- [ ] descriptions using a `{gdscript} const` for the description is a bad choice, we should use a virtual function
+- [ ] the test name and title should use a virtual function
+- [ ] The filename should be moved to the additional info expansion where the description also lives
+- [ ] The additional play executables should be configurable rather than hard coded, so we can any variants
+- [ ] hooks should be a configurable array
+	- [ ] hook configuration should be paired with the hook somehow.
+	- [ ] main code body shouldn't know anything about any specific hooks
+	- [ ] hooks should use indirect mechanisms like base class functions, and signals to communicate with the session
+- [ ] The editor UI should remember things
+	- [ ] the folding of the tree
+	- [ ] the view split
+- [ ] TR_Case uses @tool, we want to build test cases that are not @tool scripts
+	- [ ] we either split the case script, or we ignore the warning.
+	- [ ] I tried a middle script that is empty and ignores the warning, but my experiment failed, my testing was not comprehensive though so there is probably more room for testing there.
+- [ ] Reasons a test failed do not show up in the output
+- [ ] Tests are arranged haphazardly

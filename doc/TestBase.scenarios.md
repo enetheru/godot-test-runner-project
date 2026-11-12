@@ -4,11 +4,32 @@ Look up the thing you are writing. Coroutines sit together, and threads sit toge
 
 The note pairs with [TestBase.md](TestBase.md) and [CaseHarness.md](CaseHarness.md). A harness change holds when every paragraph still comes out as written. A change that moves a paragraph is an edit here first. The status words are pass, fail, timeout, refused, setup failed, and cleanup failed.
 
-## Checks
+## How a test case reports success or failure
 
 A comparison, a return, and an assert are the ways the body records its own result.
 
-### Values
+- Happy Path can show all success modes at once
+- Unhappy path needs individualised examples.
+- When can a test fail
+	- config
+	- pre - hooks
+	- setup
+	- run
+	- cleanup
+	- post - hooks
+- How are failures triggered
+	- fail on assert
+	- fail on bad return code
+	- fail on bad runcode
+- What changes the runcode
+	- manual change
+	- Check Functions
+		- check
+		- refuse
+
+
+
+### Checking a Value
 
 The body compares a few values and returns the session result. The case needs no tree. The host reports pass. The file is `res://cases/TR Features/checks.gd`.
 
