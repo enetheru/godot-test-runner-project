@@ -3,10 +3,10 @@
 - [ ] the test name and title should use a virtual function
 - [ ] The filename should be moved to the additional info expansion where the description also lives
 - [ ] The additional play executables should be configurable rather than hard coded, so we can any variants
-- [ ] hooks should be a configurable array
-	- [ ] hook configuration should be paired with the hook somehow.
-	- [ ] main code body shouldn't know anything about any specific hooks
-	- [ ] hooks should use indirect mechanisms like base class functions, and signals to communicate with the session
+- [x] hooks should be a configurable array
+	- [x] hook configuration should be paired with the hook somehow.
+	- [x] main code body shouldn't know anything about any specific hooks
+	- [x] hooks should use indirect mechanisms like base class functions, and signals to communicate with the session
 - [ ] The editor UI should remember things
 	- [ ] the folding of the tree
 	- [ ] the view split
@@ -15,3 +15,8 @@
 	- [ ] I tried a middle script that is empty and ignores the warning, but my experiment failed, my testing was not comprehensive though so there is probably more room for testing there.
 - [ ] Reasons a test failed do not show up in the output
 - [ ] Tests are arranged haphazardly
+- [ ] the TracyCapture hook should add a button or link to the card to open the trace file if it exists, or show that it is missing
+- [ ] hooks in general need to be expanded to be able to hook into more locations.
+- [ ] if the test case has options, show them in the inspector when the case is clicked
+- [ ] the hook options are stuck inside a small scroll area with an invalid heading
+- [ ] we can replace manual hook scripts with a hooks_dir in the discovery section of opts, we then add a checkbox for enable/disable for each discovered that would expose or hide their options in the dialog.

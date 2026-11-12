@@ -1,5 +1,7 @@
 # Test base
 
+Removed after tag `before-drop-testbase`. The paragraphs below describe that runner.
+
 `TestBase` exists so one test file can run as an editor script, from the test panel, inside a running game, and on its own. The hosts do not call it the same way. The extra layers are the adaptations between them: a self-pin, a deferred body, and a timeout that gives up on the body.
 
 This note reads `addons/enetheru.test-runner` as it stands. Nothing in it is a decision. The hosts are how a run is started. The run is what `run_test` does after that. The result value and the shared session are where one test comes to mean two things. Idle code is what those paths leave unused. The last part is what a change makes stale, and one smaller shape, offered as a sketch.

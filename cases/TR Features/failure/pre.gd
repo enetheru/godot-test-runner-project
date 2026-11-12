@@ -7,11 +7,11 @@ const DESCRIPTION: String = "Pre returns an error. The host reports fail and ski
 
 
 class Gate extends TR_Hook:
-	func pre() -> Error:
+	func _pre() -> Error:
 		return FAILED
 
 
-	func post() -> Error:
+	func _post() -> Error:
 		return OK
 
 
@@ -23,7 +23,7 @@ class Gate extends TR_Hook:
 func                        ________OVERRIDES________              ()->void:pass
 
 func _configure() -> void:
-	session.hooks = Gate.new()
+	session.hooks.append( Gate.new() )
 
 
 func _run_test() -> int:

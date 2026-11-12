@@ -17,14 +17,14 @@ class Probe extends TR_Hook:
 	var sink: TR_CaseSession
 
 
-	func pre() -> Error:
+	func _pre() -> Error:
 		saw_pre = true
 		return OK
 
 
-	func post() -> Error:
+	func _post() -> Error:
 		sink._note( "post" )
-		# Drop the session edge. session.hooks is the remaining reference.
+		# Drop the session edge. The hooks array is the remaining reference.
 		sink = null
 		return OK
 
@@ -41,14 +41,16 @@ func _configure() -> void:
 	session.budget_s = 2.5
 	var probe := Probe.new()
 	probe.sink = session
-	session.hooks = probe
+	session.hooks.append( probe )
 
 
 func _run_test() -> int:
 	session.check( session.budget_s == 2.5, "budget" )
-	var installed: Variant = session.hooks
-	session.check( installed is Probe, "hooks" )
-	if installed is Probe:
-		var probe: Probe = installed
-		session.check( probe.saw_pre, "pre" )
+	var installed: Probe = null
+	for hook: TR_Hook in session.hooks:
+		if hook is Probe:
+			installed = hook as Probe
+	session.check( installed != null, "hooks" )
+	if installed != null:
+		session.check( installed.saw_pre, "pre" )
 	return session.runcode

@@ -14,12 +14,12 @@ class Probe extends TR_Hook:
 	var sink: TR_CaseSession
 
 
-	func pre() -> Error:
+	func _pre() -> Error:
 		saw_pre = true
 		return OK
 
 
-	func post() -> Error:
+	func _post() -> Error:
 		sink._note( "post" )
 		# The session still holds this hook.
 		sink = null
@@ -36,14 +36,20 @@ func                        ________OVERRIDES________              ()->void:pass
 func _configure() -> void:
 	var probe := Probe.new()
 	probe.sink = session
-	session.hooks = probe
+	session.hooks.append( probe )
 
 
 func _run_test() -> int:
-	var installed: Variant = session.hooks
-	session.check( installed is Probe, "hooks" )
-	if installed is Probe:
-		var probe: Probe = installed
-		session.check( probe.saw_pre, "pre" )
+	var installed: Probe = _probe()
+	session.check( installed != null, "hooks" )
+	if installed != null:
+		session.check( installed.saw_pre, "pre" )
 
 	return session.runcode
+
+
+func _probe() -> Probe:
+	for hook: TR_Hook in session.hooks:
+		if hook is Probe:
+			return hook as Probe
+	return null

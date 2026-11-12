@@ -8,11 +8,11 @@ const DESCRIPTION: String = "The body passes. Post returns an error. The host re
 
 
 class Gate extends TR_Hook:
-	func pre() -> Error:
+	func _pre() -> Error:
 		return OK
 
 
-	func post() -> Error:
+	func _post() -> Error:
 		return FAILED
 
 
@@ -24,7 +24,7 @@ class Gate extends TR_Hook:
 func                        ________OVERRIDES________              ()->void:pass
 
 func _configure() -> void:
-	session.hooks = Gate.new()
+	session.hooks.append( Gate.new() )
 
 
 func _run_test() -> int:

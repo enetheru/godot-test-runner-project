@@ -74,7 +74,7 @@ Play, on any flavour, starts one player scene. That scene attaches the tree cloc
 
 Script points `-s` at the runner's `MainLoop`, not at the case. That loop constructs the session, attaches the loop clock, and runs the cases it was given. A case marked `needs_tree` is refused before it starts. A case that only checks values, or that awaits a signal the loop itself emits, can run. There is no root, no `process_frame`, and no `Timer` node.
 
-`TracyCapture` installs on the session. The header splice can no longer drop it, because the header is no longer rewritten. A capture that needs a frame mark still belongs to a tree host. The script host does not invent one.
+A hook named by the options list, or by a case constant `HOOK` or `HOOKS`, loads on the session. A capture that needs a frame mark still belongs to a tree host. The script host does not invent one.
 
 ## Proof
 
@@ -94,7 +94,7 @@ A native case is not part of this proof. The GDExtension shape stays as it is un
 
 The result words stay: pass, fail, setup failed, cleanup failed, and timeout. `RetCode` stays inverted, with `TEST_OK` as 1, until a separate change. On a tree host the timer still does not cover a `_setup` that never returns. The script host has the same hole until its loop clock covers setup. Moving that deadline is the timeout work in [TestBase.md](TestBase.md), and it is not required to separate the case from the clock.
 
-The existing `@tool` scripts stay on `TestBase` through the proof. They still run from the dock and from File > Run. The proof does not wrap them, and it does not delete `@tool` from them.
+The dock runs case scripts. The `TestBase` scripts are gone.
 
 ## Order
 
