@@ -1,249 +1,329 @@
-# Failure cases
+# Scenarios
 
-Pair to [TestBase.md](TestBase.md). Each entry is a what-if that can leave the editor wrong after a run has already reported a result. Under it is the failure, then a case that makes the failure visible.
+Look up the thing you are writing. Coroutines sit together, and threads sit together. The heading is the situation. The paragraph is that situation, then the result the host reports.
 
-Watch three places. The run that caused it. The next run. The process after both, including orphan nodes, open processes, and the editor's scene. A pass that only happened because nothing was watching those places is not a pass. The case belongs to the run that made the mess. The next run is not the detector.
+The note pairs with [TestBase.md](TestBase.md) and [CaseHarness.md](CaseHarness.md). A harness change holds when every paragraph still comes out as written. A change that moves a paragraph is an edit here first. The status words are pass, fail, timeout, refused, setup failed, and cleanup failed.
 
-## Work still running
+## Checks
 
-`_run_test` and `_cleanup` can return while another fiber is still parked. The host then stores the result and starts something else. The parked fiber resumes into that world.
+A comparison, a return, and an assert are the ways the body records its own result.
 
-**What if the body starts a coroutine and never awaits it?**
-  The coroutine resumes after cleanup, often on a node cleanup already freed, or during the next test.
-  Case. Setup parents a `Node` to the root. The body starts `SceneTree.create_timer(0.2)` and connects `timeout` to a function that writes a mark on that node. The body does not await the timer. It returns pass. Cleanup frees the node and returns. Wait past the timer. Watch for an error after the result was stored, and for the mark being written while the next test is running.
+### Values
 
-**What if cleanup starts work and returns before that work finishes?**
-  The host believes teardown is done. The deferred free, the signal, or the frame callback runs one idle later and hits the next test.
-  Case. Cleanup `queue_free`s the node from the case above and also does `node.call_deferred("set_name", "late")`, then returns without awaiting a frame. The next test runs on the following idle and looks up children of the root. Watch for the renamed node still being there, or for `set_name` on a freed instance.
+The body compares a few values and returns the session result. The case needs no tree. The host reports pass. The file is `res://cases/TR Features/checks.gd`.
 
-**What if a deferred call is queued and the result is stored first?**
-  `call_deferred` and `process_frame` run after the host has copied `output` and released the instance. The call lands on a freed object, or on a live one whose result can no longer change.
-  Case. The body `call_deferred`s a function that appends a line to `output` and parents a node. The body then returns pass with no await. Watch the stored output for the missing line, the debugger for a call on a freed instance, and the root for the node.
+### Failed check
 
-**What if a signal on a long-lived object stays connected?**
-  The tree, the root, or an autoload outlives the test. The connection fires on the next scene change, the next input event, or the next test's node.
-  Case. Setup connects `scene_tree.node_added` to a method on the test. The body returns pass. Cleanup does not disconnect. The next test parents a node. Watch that method run, or an error if the test instance has already been freed.
+One comparison fails, and the body still returns pass. The host reports fail. The label is an output line, and the return leaves the check failed. The file is `res://cases/TR Features/failure/check.gd`. It passes one comparison, fails `1 == 2`, passes a later check, and returns pass.
 
-**What if two fibers are parked and only one is the body?**
-  The timeout, or a normal finish, completes one fiber. The other is still awaiting. When it resumes it calls `_cleanup` again, emits a second result, or touches objects the first finish already released.
-  Case. The body awaits a signal nobody emits, and before that await it also connects `scene_tree.process_frame` to a function that awaits a second frame and then parents a node. Force the cap. Watch for a single result, then for the process-frame function parenting a node after that result.
+### Fail return
 
-**What if the body awaits one frame of a two-step handshake?**
-  The first resume is enough for the body to return. The second step was another signal, already connected, and it runs after cleanup.
-  Case. A node emits `ready` immediately on `add_child`, and emits a custom `settled` on the next frame. The body adds the node, awaits `ready`, and returns. It does not await `settled`. `settled` writes a mark. Cleanup frees the node before the next frame. Watch for the mark, or for `settled` on a freed node.
+Every check passes, and the body returns fail. The host reports fail. The file is `res://cases/TR Features/failure/return_code.gd`.
+
+### Assert
+
+The body executes `assert(false)` and has nothing after it. The editor host and a template_debug play report fail. template_release refuses the case before the body, because that flavour compiles `assert` out. `res://tests/test_runner/test_001/test_assert_fail.gd` is that body on the old base, and it stays until a feature file exists.
+
+## Coroutines
+
+The body can await. Work it starts and leaves parked is still this run. The next case is the wrong place to notice it.
+
+### One frame
+
+The body awaits one process frame and then returns. A tree host reports pass. The script host refuses the case before the body, reason `needs_tree`. The file is `res://cases/TR Features/frame.gd`.
+
+### Unawaited timer
+
+Setup parents a node to the root. The body arms a short timer, connects it to a function that writes a mark on that node, and returns pass without awaiting. Cleanup frees the node. The mark, and any error on the freed node after the result was stored, belong to this run.
+
+### Cleanup returns early
+
+Cleanup queues the node free, defers a rename, and returns before the next idle. The rename belongs to this run. The next case finding the node still there, or the rename landing on a freed instance, is this run's failure.
+
+### Deferred call
+
+The body defers a function that appends a line and parents a node, then returns pass with no await. The stored output is missing that line, the call lands on a freed instance, or the node is on the root after the result. Any of those is this run's failure.
+
+### Signal left connected
+
+Setup connects `node_added` on the tree to a method on the case. The body returns pass. Cleanup leaves the connection. The next case parents a node and that method runs, or the method errors because the case is already gone. The connection belongs to the run that made it.
+
+### Two fibers
+
+The body awaits a signal nobody emits, and it also connects `process_frame` to a function that awaits another frame and then parents a node. The budget ends the run. The host stores one result. The process-frame function parenting a node after that result is this run's failure.
+
+### Handshake
+
+A node emits `ready` as it enters the tree and emits `settled` on the next frame. The body adds the node, awaits `ready`, and returns. `settled` writes a mark. Cleanup frees the node before that frame. The mark, or `settled` on a freed node, belongs to this run.
 
 ## Threads
 
-A `Thread` or a `WorkerThreadPool` task is not a coroutine. Cleanup can return while it is still inside Godot. `wait_to_finish` on the main thread can also deadlock the process the cap is supposed to protect.
+A thread keeps running after the body returns. Joining it is part of the case. `wait_to_finish` on the main thread can also stall the process the budget is supposed to protect.
 
-**What if a thread is still running when cleanup returns?**
-  The worker later calls into a node, a resource, or the tree. That call is off the main thread. It errors, corrupts the tree, or lands in the next test.
-  Case. The body starts a `Thread` that sleeps, then sets a variable on an autoload. The body returns pass without joining. Cleanup returns without joining. The next test reads the autoload, then the worker writes it. Watch the autoload change after the first result, and any thread-safety error from the worker.
+### Still running
 
-**What if the worker and the main thread wait for each other?**
-  The main thread calls `wait_to_finish` while it still holds the lock, the semaphore, or the queue the worker needs. The cap never fires, because the main thread is blocked inside the join.
-  Case. Setup creates a `Mutex`, locks it, and starts a worker whose first act is to lock that same mutex. Cleanup locks nothing new and calls `wait_to_finish`. Watch the editor freeze. A cap that depends on the main thread pumping does not expire during this freeze.
+The body starts a thread that sleeps and then writes an autoload, and returns pass without joining. Cleanup returns without joining. The autoload changing after the result, or a thread-safety error from the worker, is this run's failure.
 
-**What if the worker was never started?**
-  `Thread.start` failed, or the body returned before `start`. Cleanup always joins. `wait_to_finish` on a thread that never started is an error, and that error can replace the original failure.
-  Case. The body calls `start` with a callable and, on a forced failure from a stand-in that returns an error before `start`, returns fail. Cleanup calls `wait_to_finish` unconditionally. Watch which failure is stored: the body's, or the join's.
+### Deadlock
 
-**What if the worker hands an object back after the test has released it?**
-  The worker builds a node or a resource and `call_deferred`s it to the test. The test has already returned, and the host has dropped it. The deferred call is discarded or hits a freed instance. The object is now orphaned on a thread that is about to exit.
-  Case. The worker instantiates a packed scene and `call_deferred`s a function on the test with that node. The body does not await that function. Cleanup joins the thread, which is already exiting, and does not free the node. Watch for an orphan node and for a call on a freed instance. `tests/threads/test_instantiate.gd` is the shape of the hand-off, without the early return.
+Setup locks a mutex and starts a worker whose first act is to lock that same mutex. Cleanup calls `wait_to_finish` while the main thread still holds the lock. The editor freezes. The budget never fires, because the main thread is inside the join and is not pumping.
 
-**What if only one of two workers is joined?**
-  The joined worker is gone. The other is still in the pool or the `Thread`. The test looks clean because the join that was written down succeeded.
-  Case. The body starts two threads that each sleep and then increment one autoload counter. Cleanup joins the first only. Watch the counter move after the result, and watch `Thread.is_started` on the second.
+### Never started
 
-**What if a `WorkerThreadPool` task is never waited on?**
-  `add_task` runs on a pool thread after the test has returned. The task captures the test, or a node, and runs during the next test.
-  Case. The body adds a task that waits briefly, then appends to an autoload array. It does not call `wait_for_task_completion`. Cleanup returns. The next test reads the array twice, a frame apart. Watch the array grow between the reads.
+The body fails before `Thread.start` succeeds. Cleanup calls `wait_to_finish` on a thread that never started. The stored failure is the body's. The error from the join does not replace it.
 
-## Setup left in place
+### Hand-off
 
-Anything setup acquires is still there when setup fails, when the body fails, or when cleanup forgets it. `queue_free` does not mean the node is gone yet.
+The worker instantiates a scene and defers a call onto the case with that node. The body returns without awaiting the call. Cleanup joins a thread that is already exiting and does not free the node. An orphan node, or a call on a freed case, is this run's failure. `res://tests/test_runner/threads/test_instantiate.gd` performs the hand-off and still waits. It times the instantiate. It is not this failure.
 
-**What if setup acquires something and then fails?**
-  The body never runs. A harness that skips cleanup on a failed setup never releases the node, the thread, the process, or the profiler setup already started.
-  Case. Setup parents a node, starts a `Thread` that waits on a semaphore, then returns a failure. Do not give the body a chance to clean up. Watch the root for the node and `OS` for the thread after the result. The following test is a plain pass. Watch it stay a plain pass while the node and the thread are still there. That plain pass is the bug.
+### One joined
 
-**What if setup fails halfway through two acquisitions?**
-  The first resource exists. The second never did. A single cleanup path that assumes both exist will error on the second and skip releasing the first.
-  Case. Setup parents a node, then returns failure before starting the thread it would have stored in the same field. Cleanup, if it runs, joins the thread without a null check and only then frees the node. Watch the node remain when the join errors.
+The body starts two threads that each sleep and then increment one counter. Cleanup joins the first. The counter moving after the result, or the second thread still started, is this run's failure.
 
-**What if a node is parented to the root and never freed?**
-  The next test finds it, collides with its name, or treats it as part of the game.
-  Case. Setup does `Node.new()`, names it `leftover`, and `add_child`s it to the root. The body returns pass. Cleanup returns without freeing it. The next test fails if `leftover` is still a direct child of the root.
+### Pool task
 
-**What if the only free is `queue_free`, and the next test starts on this frame?**
-  The node is still in the tree until the idle flush. A suite that starts the next test immediately still sees it. So does `find_child`.
-  Case. Cleanup `queue_free`s `leftover` and returns. The suite starts the next test without awaiting a frame. That test looks for `leftover`. Watch it find the node. Await one more frame and watch the node disappear too late.
+The body adds a pool task that waits, then appends to an autoload array, and does not wait for the task. Cleanup returns. The next case reads the array twice, a frame apart. The array growing between the reads is this run's failure.
 
-**What if a node is never added to the tree and never freed?**
-  It is an orphan. The suite can pass. The leak shows up as an orphan count, or at editor exit.
-  Case. The body does `Node.new()` and drops the variable without `free` or `add_child`. Snapshot the orphan-node count before the run and after cleanup. Watch it rise. `print_orphan_nodes` names it.
+## Setup and cleanup
 
-**What if the test's node name is the harness timer's name?**
-  The timer is parented to the root under `resource_path.validate_node_name()`. A leftover, or a real node, with that name is queued free on the next run because it looks like an old timer. The inverse also holds: two script paths that sanitize to one name share one timer.
-  Case. Parent a `Label` to the root under the validated name of a known test, before that test runs. Run the test. Watch the `Label` get queued free. Then run two tests whose sanitized names match and whose bodies both hang. Watch them share one timer, so one cap finishes both or neither.
+Setup takes something. Cleanup gives it back. A phase that fails has its own status.
 
-**What if a `Timer`, a `Tween`, or a `SceneTreeTimer` of the test's own is left running?**
-  It fires during the next test and calls a method, or fires on a freed instance.
-  Case. The body creates a `Tween`, tweens an autoload property over half a second, and returns without killing the tween. Cleanup does not kill it. The next test reads that property twice. Watch it change.
+### Owned node
 
-**What if a file, a port, or a process is left behind?**
-  On Windows the next open of that path fails because the process still holds it. A capture port stays bound. A later run then fails for a reason that belongs to the earlier run.
-  Case. The body starts a long-lived process that writes a file under `user://`, and does not store the pid. Cleanup returns. The next test tries to rewrite that file and to bind the same port. Watch the lock and the bind error. `TracyCapture` is the real shape of this case when the capture process is still alive after a failed end.
+Setup parents a node, the body uses it, and cleanup frees it. A tree host reports pass. The script host refuses the case, reason `needs_tree`. The file is `res://cases/TR Features/setup_cleanup.gd`.
 
-**What if the profiler, the time scale, or the pause flag is left changed?**
-  Recording stays on, categories stay off, `Engine.time_scale` stays at 0, or the tree stays paused. Later tests hang, record nothing, or run in slow motion. A timer that respects time scale or pause never reaches the cap.
-  Case. Three separate runs. One sets `Engine.time_scale` to `0` and returns. One sets `get_tree().paused` to true and returns. One disables a profiler category and returns. None of them restore the value. A following test that only awaits a short timer is the watch. It should finish. A hang, or a category that stays off, is the failure.
+### Setup error
 
-**What if the editor's input or window is left captured?**
-  `Input.mouse_mode` captured, or a fullscreen window, makes the editor look hung. The suite result can still say pass.
-  Case. The body sets `Input.mouse_mode` to captured and returns without restoring `VISIBLE`. Watch the editor after the result. Restore belongs to that run.
+Setup returns an error and has acquired nothing. The host reports setup failed and stops before the body and before cleanup. The file is `res://cases/TR Features/failure/setup.gd`. The body would fail a check if it ran. Anything acquired before that error has to be released in setup, because cleanup will not run.
 
-**What if an autoload, a static, a preloaded resource, or the random seed is mutated?**
-  The next test's pass depends on what the previous test wrote. Order changes the result. A static on the test script survives the instance. A preloaded resource is one object shared by every load.
-  Case. Four mutations, one per run. An autoload integer incremented and not restored. A `static var` on the test script set to a sentinel. A property written on a `preload`ed resource. `seed(1)` called and not restored. Each following test reads that location and fails if it sees the sentinel. The following test must not itself reset the value before reading it.
+### Cleanup error
 
-**What if the edited scene or a global input action is mutated?**
-  A node added to `EditorInterface.get_edited_scene_root()` dirties the scene the person has open. An `InputMap` action added and not erased is still there for the next test and for the editor.
-  Case. The body adds a child to the edited scene root and adds an input action named `failure_case_action`. Cleanup does neither removal. Watch the scene stay dirty, and watch `InputMap.has_action("failure_case_action")` from a following test.
+The body passes and cleanup returns an error. The host reports cleanup failed. The file is `res://cases/TR Features/failure/cleanup.gd`.
 
-**What if a group or a meta entry is left on a node the test does not own?**
-  The root, an autoload, or the edited scene keeps `set_meta` and `add_to_group`. A later `get_nodes_in_group` or `get_meta` sees the test's value.
-  Case. The body adds the root to group `failure_case` and `set_meta("failure_case", 1)` on the root. Cleanup does not undo either. The next test fails if that group or that meta is present.
+### Halfway
 
-## The instance and the tree
+Setup parents a node and then returns an error before the thread it meant to start. A cleanup that joins the thread first, and only then frees the node, errors on the missing thread and leaves the node. Cleanup releases what exists and tolerates what was never created. The host still reports setup failed.
 
-The host drops its reference when it sees a result. Anything still parked on that instance then runs against a freed object, or keeps the instance alive forever.
+### Same-frame free
 
-**What if the last reference is dropped while a fiber is parked?**
-  The timeout path does this on purpose today: the host returns, the pin goes, the body is still awaiting. The resume errors on a freed instance, or never happens.
-  Case. The body awaits a signal nobody emits and would parent a node after that await. Force the cap. Let the host drop the instance. Deliver the signal anyway. Watch for a freed-instance error, and for whether a node appears after the timeout result.
+Cleanup `queue_free`s a node named `leftover` and returns. The next case, started on this same frame, still finds `leftover`. The node is gone after the idle flush. Finding it is this run's leftover, seen one case too late.
 
-**What if a `Node` test is `queue_free`d while a child fiber is parked?**
-  Play mode frees the node when the run returns. A callback queued on it dies with it, or runs in the free. A resource the callback was going to release leaks.
-  Case. The body connects `process_frame` to a function that frees a `RID` stored on the test, then awaits a signal nobody emits. Force the cap so the host frees the node before that frame. Watch the `RID` still allocated after the result.
+### Orphan
 
-**What if something that outlives the test holds the test?**
-  A lambda on an autoload, a signal connection from the autoload to the test, or `set_meta` of the test on the root keeps the instance. Its `_process`, its timer, or its connections keep running after the suite has moved on. The mirror is a cycle that should have ended and does not.
-  Case. The body connects an autoload signal to a method on the test and never disconnects. The method increments a counter. After the result, emit that signal twice. Watch the counter move. The test instance is still alive.
+The body does `Node.new()` and drops the variable, with no `free` and no `add_child`. The orphan count rises across the run. `print_orphan_nodes` names it. The suite can still report pass. The orphan is this run's failure.
 
-**What if a deferred call was the only way the body would finish, and the instance is already gone?**
-  Godot drops a deferred call on a freed object. A waiter that needed that call hangs until some other cap.
-  Case. A worker `call_deferred`s the method that would emit the signal the body is awaiting. Before the idle runs, drop the test instance the way a timeout drop does. Watch the body never resume, and watch the host's cap be the only thing that ends the run.
+### Timer name
 
-**What if the test removes the current scene, or frees the children of the root?**
-  A test parented under the current scene is freed mid-body. A harness timer parented under the root is freed with those children. The cap then never fires, and the await errors because the tree or the node is gone.
-  Case. Two runs. One calls `change_scene_to_file` on a scene that does not contain the test, while the test node is parented to the current scene, during an await. The other frees every direct child of the root, including the harness timer, then awaits a signal nobody emits. Watch for an await on a freed node, and for a run that does not return.
+The harness parents its timer to the root under the validated name of the script path. A node already there under that name is queued free, because it looks like an old timer. Two script paths that sanitize to one name share one timer, so one budget finishes both waits or neither.
 
-**What if the test is not in the tree when it waits?**
-  `get_tree()` is null. A timer parented to the test does not tick. An await on `process_frame` from that node fails. The host can sit in setup with no cap.
-  Case. Construct the test and call `run_test` before `add_child`. The body awaits `get_tree().process_frame` under the assumption there is a tree. Watch the failure be a reported fail from this run, not an editor error with no result.
+### Tween left running
 
-## The cap
+The body creates a tween on an autoload property over half a second and returns without killing it. Cleanup leaves it. The next case reads that property twice and sees it change. The change belongs to the run that created the tween.
 
-The deadline only helps if the main thread is pumping, and if the timer is still in a tree that is actually advancing.
+### File and port
 
-**What if the body never returns to the tree?**
-  `while true` with no await, or `OS.delay_msec` for longer than the cap, blocks the main thread. The timer cannot emit. The host cannot store a timeout.
-  Case. The body calls `OS.delay_msec` for several times the cap. Watch the host stay inside the run for that whole delay, then take whatever result the body returns. The delay ending is not a timeout.
+The body starts a long-lived process that holds a file under `user://` and a port, and it does not store the pid. Cleanup returns. The next case fails to rewrite the file or to bind the port. On Windows the lock is the usual shape. `TracyCapture` is the same shape when the capture process is still alive after a failed end.
 
-**What if time scale is 0, or the tree is paused, and the timer respects both?**
-  The cap is armed and does not elapse. A test that paused the game as its subject, and then awaits, never finishes.
-  Case. Setup sets `Engine.time_scale` to `0` and `get_tree().paused` to true. The body awaits a signal nobody emits. Use a timer that does not ignore time scale and does not ignore pause. Watch the run fail to time out until something else unpauses the tree.
+### Time scale and pause
 
-**What if the body and the cap finish on the same frame?**
-  One path stores pass and runs cleanup. The other stores timeout and skips cleanup. Whichever runs second overwrites the result, frees twice, or cleans up after the host has already returned.
-  Case. Setup sets the cap to one frame. The body awaits exactly one `process_frame` and returns pass. Run it many times. Watch for one result per run, and for cleanup either always running or never running, not a mix that depends on call order.
+One run sets `Engine.time_scale` to `0` and returns. One sets the tree paused and returns. One disables a profiler category and returns. None of them restore the value. A following case that only awaits a short timer hangs, or the category stays off. The restore belongs to the run that changed it.
 
-**What if cleanup is still awaiting when the cap fires?**
-  The host stores timeout and releases the instance. Cleanup later resumes, fails, and writes a second result over the timeout. Or it releases something the late body is still using.
-  Case. The body returns pass. Cleanup awaits a signal nobody emits, after it has already freed the node the body created. Force the cap during that await, let the host record timeout, then emit the signal. Watch the stored result stay timeout, and watch for a second completion or a freed-instance error from the rest of cleanup.
+### Mouse and window
 
-**What if the cap is 0 or negative?**
-  Some timers emit on the next frame. Some treat the value as already expired. Some never arm. The run can pass, hang, or timeout before setup finishes, depending on that accident.
-  Case. Setup sets the cap to `0` and returns success. The body would return pass. Run again with the cap set to `-1`. Watch both runs return a definite result, and watch a pass not depend on winning a race against the next frame.
+The body sets `Input.mouse_mode` to captured and returns. The suite can report pass while the editor looks hung. Restoring `VISIBLE` belongs to that run.
 
-## The suite
+### Shared values
 
-One process runs every test. A leftover from one case above becomes the next test's starting state. Overlap makes two bodies share that state at once.
+Four runs, one mutation each. An autoload integer incremented and left there. A `static var` on the case set to a sentinel. A property written on a preloaded resource. `seed` called and left there. The following case reads that location and fails when it sees the sentinel. It reads before it resets anything. The sentinel belongs to the run that wrote it.
 
-**What if the next test starts before the previous test's late work?**
-  The selection does not wait, or the service starts a parallel batch. Both bodies parent nodes, both connect the same autoload signal, both name a timer from their script path.
-  Case. Two tests. Each awaits two frames and parents a uniquely named node in cleanup's last line, which is too late if cleanup is skipped, and in the body if it is not. Start them together. Watch both nodes, both results, and any error from a second `add_child` of the same timer name.
+### Edited scene
 
-**What if the same script is run twice at once?**
-  Both runs share one static, one preloaded resource, and, in play, one generated file path. One cleanup deletes the file the other is still executing.
-  Case. Start the same play-mode test twice without waiting. Each run writes a marker into a static and reads it back after a frame. Watch the marker change under the other run. Watch one run delete a script the other is still on.
+The body adds a child to `EditorInterface.get_edited_scene_root()` and adds an input action named `failure_case_action`. Cleanup removes neither. The open scene stays dirty, and a following case sees `InputMap.has_action("failure_case_action")`. Both belong to the run that added them.
 
-**What if one script in the middle cannot instantiate?**
-  The suite records a failure for it and continues. The half-loaded script, or a static initialiser that already ran, is still in the process.
-  Case. A file that begins with `test` has a parse error after a `static var` initialiser that increments an autoload. It sits between two plain passes. Watch the passes keep their own results, and watch the autoload. The increment from the broken file is still a leftover.
+### Group and meta
 
-**What if a test starts another test?**
-  The outer run is awaiting. The inner run uses the same tree, the same autoload, and maybe the same harness service. The outer cleanup runs after the inner run has already mutated what the outer setup built.
-  Case. The body asks the service to run a second test that increments an autoload and returns. The outer test then reads the autoload and returns. Watch the inner result exist, the outer result exist, and the autoload change be visible to the outer body. Then watch the outer cleanup not tear down the inner test's node.
+The body adds the root to the group `failure_case` and sets meta `failure_case` on the root. Cleanup undoes neither. The next case sees the group or the meta. Either one belongs to the run that set it.
 
-**What if two game instances both enter the runner?**
-  The editor is set to more than one run instance. A scene whose `_ready` starts a test starts it once per process. Files under `user://` and any shared port collide. The two processes do not share a scene tree, so a tree leak in one is invisible to the other.
-  Case. A test writes a fixed path under `user://` and binds a fixed port. Launch two instances on purpose. Watch the second fail on the file or the port. That failure belongs to the shared resource, not to the assertions in the test.
+## Instance
 
-## The editor re-enters
+The host stores a result and drops the case. A fiber still parked on that case then runs against a freed object, or it keeps the case alive after the suite has moved on.
 
-The test is running inside the editor. Saving a script, reloading a plugin, or opening a dialog is not outside the run. It can replace the bytecode under the parked function.
+### Dropped while parked
 
-**What if a `.gd` file is written during the run?**
-  The editor reimports and reloads scripts. A function that is currently awaiting is reloaded out from under itself. The resume faults, or runs a mix of old and new bytecode. A generated play copy beside the test is the usual way this happens.
-  Case. During the body, after an await has begun, write a harmless comment to a `.gd` file the running test actually depends on, then await another frame. Watch the resume. A script error after the write, with the host never storing a result, is the failure.
+The body awaits a signal nobody emits and would parent a node after that await. The budget fires and the host drops the case. The signal is delivered anyway. An error on a freed instance, or a node appearing after the timeout result, is this run's failure.
 
-**What if the running command reloads the script that is on the stack?**
-  The reload replaces the script while `_run` or a command is still inside it. The finish path then calls into a null script, or the VM reports a bad instruction pointer.
-  Case. From a command that is itself a running script, reload that script's resource before the command returns. Watch the command still produce one result, or a single reported failure. A bytecode fault with no result is the failure. This is the reload that already faults when `RUN_SCRIPT` reloads the command that is executing.
+### Freed with the fiber
 
-**What if `EditorProgress` is opened from the flush the host arrived on?**
-  File > Run enters on a message-queue flush. `EditorProgress` refuses to open there. The test errors, or the dialog never appears, and the body still returns pass.
-  Case. Open an `EditorProgress` task as the first line of the body, on File > Run, before any further await. Watch the task open, or watch a reported fail. A pass with an error in the debugger is the failure.
+The body connects `process_frame` to a function that frees a `RID` stored on the case, then awaits a signal nobody emits. The budget frees the case before that frame. The `RID` still allocated after the result is this run's leak.
 
-**What if a dialog is left open?**
-  A modal file dialog or accept dialog holds the editor. The next test's input goes to the dialog. The person cannot tell the suite from a stuck editor.
-  Case. The body shows an `AcceptDialog` and returns without hiding it. The next test is a plain pass that does not look for the dialog. Watch the dialog still be visible after the suite result.
+### Held alive
 
-**What if a headless editor runs a test that needs a window?**
-  There is no viewport to grab, no mouse to capture, and a popup cannot show. The test awaits an input event that will never come.
-  Case. Run a body that awaits `gui_input` on a control under the headless main loop, with a normal cap. Watch a timeout from this run, not a hang and not a pass.
+The body connects an autoload signal to a method on the case and never disconnects. The method increments a counter. After the result, that signal is emitted twice and the counter moves. The case is still alive. The connection belongs to the run that made it.
 
-**What if an engine error is delivered after the result?**
-  `push_error` inside `call_deferred`, after the body has returned pass, breaks the debugger on the next idle when break-on-error is set. The panel already shows pass. The editor is paused on a red error that belongs to the previous test.
-  Case. The body `call_deferred`s `push_error` and returns pass. Watch the stored result and the debugger. The error belongs to that run's result.
+### Deferred finish
 
-**What if merely loading the script runs the test?**
-  An `@tool` script with work in a static initialiser, `_init`, or `_enter_tree` runs when the dock scans the file. The suite has not started. The autoload is already mutated, and a later run sees a dirty process and calls it a failure of the test.
-  Case. Give a test file a `static var` initialiser that increments an autoload. Refresh the test tree and do not run the test. Watch the autoload. Then run the test once and watch it increment again. The scan and the run are both visible, or the scan does not count as a run.
+A worker defers the method that would emit the signal the body is awaiting. The host drops the case before that idle, the way a timeout drop does. The body never resumes. The budget is the only thing that ends the run.
 
-## A result that hides the failure
+### Scene torn down
 
-The leftovers above are one family. A stored pass in front of a real failure is the other. The case watches the stored result, not the absence of a crash.
+Two runs. One calls `change_scene_to_file` on a scene that does not contain the case, while the case is parented to the current scene, during an await. The other frees every direct child of the root, including the harness timer, then awaits a signal nobody emits. The await hits a freed node, or the run never returns. The run that tore the tree down owns that result.
 
-**What if checks failed and the body still returns pass?**
-  The failed check is in the log. The stored result is pass, because the return replaced it. The panel shows success.
-  Case. Fail one equality check, then return the pass value. Watch the stored result be fail, and watch the check's message still be in the output. `tests/test_001/test_tests.gd` is the passing shape of "return the running result". This case is that shape with a check that does not hold.
+### No tree yet
 
-**What if the body aborts with no return?**
-  An `assert`, a null call, or a stack overflow never reaches a return. The default integer is a success on a normal function. The host can store pass because nothing wrote a failure.
-  Case. `assert(false)` as the only line. A second run calls a method on `null`. Watch both store fail. `tests/test_001/test_assert_fail.gd` is the assert seed.
+The case is constructed and `run_test` is called before `add_child`. The body awaits `get_tree().process_frame` on the assumption there is a tree. The failure is a reported fail from this run. An editor error with no stored result is the wrong outcome.
 
-**What if `push_error` or `push_warning` is the only symptom?**
-  The body returns pass. The debugger is red or yellow. The suite is green.
-  Case. The body calls `push_error` and `push_warning` and returns pass. Watch the stored result be fail, or watch the output carry those messages and the result stay fail. A green row with a red debugger is the failure.
+## Clock
 
-**What if a late line arrives after the host copied the output?**
-  The copy is what `TESTS_RUN` returns and what the panel shows. The test's own array grows afterwards. Anyone reading the live object disagrees with the stored result.
-  Case. The body schedules a deferred append to `output` and returns pass. The host copies `output` at the result. Wait a frame and compare the copy with the live array. Watch them diverge.
+The budget is the host giving up on a body that has not returned. It only helps while the main thread is pumping and the timer is in a tree that is advancing.
 
-**What if a timeout and a late failure disagree?**
-  The cap stores timeout. A cleanup fiber that was already past the cancel later stores fail, or pass. The caller that read the result early disagrees with the caller that reads the fields again.
-  Case. Use the cleanup-versus-cap case from above. Read the result at the moment the host returns, and read the same fields again after the late cleanup resumes. Watch the two reads match.
+### Replaced budget
+
+The case declares a budget of 3 seconds. Configure checks that value and sets 4 seconds. The body checks the replacement. The host reports pass. The file is `res://cases/TR Features/budget.gd`.
+
+### Timeout
+
+The body waits longer than its budget. A tree host reports timeout. Cleanup would record a mark, and the stored run is missing that mark, because the host stops before cleanup. Post still runs, and the status stays timeout. The script host refuses the case, reason `needs_tree`. The file is `res://cases/TR Features/failure/timeout.gd`. It waits 0.75 seconds on a 0.25 second budget. The cleanup mark is the part this file still owes.
+
+### Zero budget
+
+The case sets the budget to 0. The host reports timeout, and the run ends on that status. A pass that depends on the next frame is the wrong result. The body would return pass if the clock let it finish. There is no file yet.
+
+### Main thread blocked
+
+The body calls `OS.delay_msec` for several times the budget, with no await. The host stays inside the run for that whole delay and then takes the result the body returns. The delay ending is a return, not a timeout.
+
+### Paused clock
+
+Setup sets `Engine.time_scale` to `0` and pauses the tree. The body awaits a signal nobody emits. A timer that respects time scale and pause never elapses. The run fails to time out until something else unpauses the tree. A budget that ignores both reports timeout.
+
+### Same frame
+
+The budget is one frame. The body awaits exactly one process frame and returns pass. Run it many times. Each run stores one result, and cleanup either always runs or never runs. A mix that depends on call order is the failure.
+
+### Cleanup still waiting
+
+The body returns pass. Cleanup frees the node the body created, then awaits a signal nobody emits. The budget fires during that await and the host records timeout. The signal is emitted afterward. The stored result stays timeout. A second completion, or a freed-instance error from the rest of cleanup, is the failure.
+
+## Hooks
+
+Pre runs before the body. Post runs after the run has a status, including a timeout. A capture is a hook the session installs when this run asked for one.
+
+### Pre and post
+
+Configure installs a hook. Pre runs before the body. Post appends a line. The host reports pass, and the line is in the output. The file is `res://cases/TR Features/hooks.gd`.
+
+### Pre fails
+
+Pre returns an error. The host reports fail, the output names the hook, and the host stops before the body. The file is `res://cases/TR Features/failure/pre.gd`.
+
+### Post fails
+
+The body passes and post returns an error. The host reports fail. The output names the hook. The file is `res://cases/TR Features/failure/post.gd`.
+
+### Capture
+
+The body checks the hook against this run's capture request. The hook is the capture when the tools are configured and the run asked for one, and the hook is empty when the capture was skipped. A tree host reports pass. The script host refuses the case, reason `needs_tree`. The file is `res://cases/hooks/tracy.gd`.
+
+## Suite
+
+One process runs the cases in a folder. Each case finishes before the next one starts. A leftover from a section above is the next case's starting state when that order slips.
+
+### One then the next
+
+Two cases in one folder share a marker. The first writes the marker in cleanup. The second reads it in setup and checks that the write already happened. The host finishes the first case before it starts the second. Both report pass. There is no file yet.
+
+### Started together
+
+Two cases each await two frames and parent a uniquely named node. They are started together. Both nodes, both results, and any error from a second `add_child` of the same timer name are visible. One result each, with the nodes from that case alone, is the sound run.
+
+### Twice at once
+
+The same case is started twice without waiting. Each run writes a marker into a static and reads it back after a frame. The marker changing under the other run, or one run deleting a script the other is still on, is the failure. Play shares one generated file path. The editor and the script host share the static and the preloaded resource.
+
+### Parse error
+
+A file whose name begins with `test` has a parse error after a `static var` initialiser that increments an autoload. It sits between two plain passes. The passes keep their own results. The increment from the broken file is still a leftover of the scan that loaded it.
+
+### Nested run
+
+The body asks the service to run a second case that increments an autoload and returns. The outer case then reads the autoload and returns. The inner result exists, the outer result exists, and the outer body can see the increment. The outer cleanup leaves the inner case's node alone.
+
+### Two games
+
+The editor is set to more than one run instance. A case writes a fixed path under `user://` and binds a fixed port. The second instance fails on the file or the port. That failure belongs to the shared resource. The two processes do not share a scene tree, so a tree leak in one is invisible to the other.
+
+## Editor
+
+The case is running where scripts reload, dialogs open, and the dock scans files. Some cases belong only to the editor, or only to the project main scene.
+
+### Editor only
+
+The body checks that the host is the editor and that the hint is set. The editor host reports pass. Play and the script host refuse the case before the body, reason `editor_only`. The file is `res://cases/TR Features/editor_only.gd`.
+
+### Main scene
+
+The case needs the project main scene. A play of that scene reports pass. The editor dock and the script host refuse the case when another scene was the one started, reason `needs_main_scene`. The file is `res://cases/TR Features/failure/main_scene.gd`.
+
+### File saved during the run
+
+During the body, after an await has begun, a harmless comment is written to a `.gd` file the running case depends on, and the body awaits another frame. The resume faults, or it runs a mix of old and new bytecode. A script error after the write, with the host never storing a result, is the failure. A generated play copy beside the case is the usual way the file gets written.
+
+### Reload on the stack
+
+A command that is itself a running script reloads that script's resource before the command returns. The command still produces one result, or a single reported failure. A bytecode fault with no result is the failure. This is the reload that faults when `RUN_SCRIPT` reloads the command that is executing.
+
+### Progress on the flush
+
+File > Run enters on a message-queue flush. Opening an `EditorProgress` task is the first line of the body, before any further await. The task opens, or the host reports fail. A pass with an error in the debugger is the failure. This build has no script-visible `EditorProgress`. `EditorToaster.push_toast` is the call a body can make instead, and `res://tests/test_runner/editor_reenters/test_editor_toast.gd` only brackets that call.
+
+### Dialog left open
+
+The body shows an `AcceptDialog` and returns without hiding it. The next case is a plain pass that does not look for the dialog. The dialog still visible after the suite result belongs to the run that opened it.
+
+### Headless
+
+The body awaits `gui_input` on a control under the headless main loop, with a normal budget. There is no viewport to grab and no popup to show. The host reports timeout from this run. A hang, or a pass, is the wrong result.
+
+### Error after the result
+
+The body defers `push_error` and returns pass. The stored result and the debugger both show that error on this run. A green row, with the editor paused on a red error that belongs to the previous case, is the failure.
+
+### Scan runs the body
+
+A case file has a `static var` initialiser that increments an autoload. Refreshing the test tree, without running the case, leaves the autoload alone. Running the case increments it once. An increment on the scan is a run that nobody asked for.
+
+## Native
+
+A native class is another way to write the body. The script names the class. The session calls are the class's.
+
+### Native pass
+
+The script names a native class. The class returns pass. The editor host, template_debug, and template_release report pass. There is no file yet. `res://tests/scene_tree` times `add_child` for a flat list and for a hierarchy, in GDScript and in a native library. Those files are the measurement. This heading is the pass.
+
+## Files
+
+These scripts repeat a heading above, or they were written while a trace was open. The guidance is the heading. The trace is not a second scenario.
+
+### Samples
+
+`test_success.gd`, `test_failed.gd`, `test_tests.gd`, and `test_timeout.gd` under `res://tests/test_runner/test_001` repeat Values, Fail return, Values again, and Timeout. `test_assert_fail.gd` stays with Assert.
+
+### Happy path
+
+`res://tests/test_runner/happy_path` repeats Values, One frame, and Owned node on the old base.
+
+### Proof
+
+`res://cases/proof` repeats Values, One frame, and Pre and post. That folder was the migration proof. The feature cases cover those three results.
+
+### Probes
+
+The scripts under `res://tests/test_runner/cap`, `coroutines`, `editor_reenters`, `instance_and_tree`, `result_hides`, `setup_left`, `suite`, `threads`, and `work_still_running` were written while a trace was open. Timeout, Failed check, and Owned node hold the three results that already have a feature file. The other scripts tidy the accident before they return, so a pass never meant the accident was contained.
+
+### Servers
+
+`res://tests/server` is twelve scripts. Each one checks that a named engine server is registered.
+
+### Timings
+
+`res://tests/scene_tree` is the measurement named under Native pass. It leaves the suite of host results.
