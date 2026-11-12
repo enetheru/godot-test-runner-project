@@ -236,7 +236,7 @@ The body returns pass. Cleanup frees the node the body created, then awaits a si
 
 ## Hooks
 
-Pre runs before the body. Post runs after the run has a status, including a timeout. A hook named by the options list, or by `HOOK` or `HOOKS`, loads before configure.
+Pre runs before the body. Post runs after the run has a status, including a timeout. A hook named by the options list, or by `hook_paths`, loads before configure. A case appends its own hook in configure, and pre runs after that.
 
 ### Pre and post
 
@@ -252,7 +252,7 @@ The body passes and post settles an error. The host reports fail. The output nam
 
 ### Capture
 
-`HOOKS` names the capture script. The session loads it. The body checks that the capture hook is installed. The script host refuses the case before the body, reason `needs_tree`. The file is `res://cases/hooks/tracy.gd`.
+Configure appends the capture hook. The body checks that the capture hook is installed. The script host refuses the case before the body, reason `needs_tree`. The file is `res://cases/TR Features/hooks/tracy.gd`.
 
 ## Suite
 

@@ -74,7 +74,7 @@ Play, on any flavour, starts one player scene. That scene attaches the tree cloc
 
 Script points `-s` at the runner's `MainLoop`, not at the case. That loop constructs the session, attaches the loop clock, and runs the cases it was given. A case marked `needs_tree` is refused before it starts. A case that only checks values, or that awaits a signal the loop itself emits, can run. There is no root, no `process_frame`, and no `Timer` node.
 
-A hook named by the options list, or by a case constant `HOOK` or `HOOKS`, loads on the session. A capture that needs a frame mark still belongs to a tree host. The script host does not invent one.
+A hook named by the options list, or by `hook_paths`, loads on the session. A case appends a hook of its own in `_configure`, and that hook's pre runs next. A capture that needs a frame mark still belongs to a tree host. The script host does not invent one.
 
 ## Proof
 
