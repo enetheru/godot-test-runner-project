@@ -22,7 +22,7 @@ Do these in order. Each one removes a second copy of a step, or a file the run n
 
 ## One card
 
-- [ ] Build the play and headless report card with `create_info`. `_card_for_case` is a second constructor for the same box.
+- [x] Play and headless cards are built with `create_info`. `_card_for_case` sets the title, the description, and the log.
 
 ## Delete what the run never calls
 
