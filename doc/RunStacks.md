@@ -15,10 +15,10 @@ Do these in order. Each one removes a second copy of a step, or a file the run n
 
 ## One launch dispatch
 
-- [ ] Make `CaseMenu.launch` the only start for the five `RunKind` ids. `main_panel._launch_kind` currently awaits `_walk_rows` for EditorScript and calls the menu for the other four.
-- [ ] Point the context-menu EditorScript path and `_run_rows_as_editor` at that same call. Both await `_walk_rows` today.
-- [ ] Start `GDFB_HEADLESS_TESTS` from `Launch.EDITORSCRIPT` through that dispatch. The plugin currently calls `begin_run`, and the batch then writes `Host.EDITOR` by hand, so this path never goes through the launch map the dock uses.
-- [ ] Keep the five starters behind that dispatch: the panel walk for EditorScript, `player.gd` for play editor, `_run_template` for the two packs, and `script_host.gd` for headless. `PlayPack.ensure` stays an export. It returns the pack path and the template launch stays in `_run_template`.
+- [x] `CaseMenu.launch` starts all five `RunKind` ids. EditorScript walks the panel rows when the panel registered that starter, and otherwise walks the paths.
+- [x] The context menu and `_launch_kind` both enter through `launch`. `_run_rows_as_editor` is the EditorScript starter that launch calls.
+- [x] `GDFB_HEADLESS_TESTS` awaits `launch` with `Launch.EDITORSCRIPT` on the filesystem menu. The batch is no longer that path.
+- [x] The starters stay behind `launch`: the panel walk, the player scene, the two template packs, and the script host. `PlayPack.ensure` still only exports.
 
 ## One card
 
