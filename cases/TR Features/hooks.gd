@@ -3,9 +3,6 @@ extends TR_Case
 
 ## Pre runs before the body. Post appends an output line.
 
-const DESCRIPTION: String = "Pre runs before the body. Post appends an output line."
-
-
 class Probe extends TR_Hook:
 	## True after pre returns.
 	var saw_pre: bool = false
@@ -32,6 +29,10 @@ class Probe extends TR_Hook:
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Pre runs before the body. Post appends an output line."
+
 
 func _configure() -> void:
 	var probe := Probe.new()

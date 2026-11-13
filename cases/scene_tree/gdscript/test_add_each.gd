@@ -3,8 +3,6 @@ extends TR_Case
 
 ## Setup builds detached nodes. The body adds each one to the scene root.
 
-const DESCRIPTION: String = "Setup builds detached nodes. The body adds each one to the scene root."
-
 const NEEDS_TREE: bool = true
 
 # Scene callbacks. The call is the cost.
@@ -31,6 +29,10 @@ var _nodes: Array[Node] = []
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Setup builds detached nodes. The body adds each one to the scene root."
+
 
 func _setup() -> Error:
 	for i: int in _COUNT:

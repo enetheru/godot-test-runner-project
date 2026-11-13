@@ -3,8 +3,6 @@ extends TR_Case
 
 ## [code]BUDGET_S[/code] fills the budget. Configure replaces it.
 
-const DESCRIPTION: String = "BUDGET_S fills the budget. Configure replaces it."
-
 const BUDGET_S: float = 3.0
 
 
@@ -14,6 +12,10 @@ const BUDGET_S: float = 3.0
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "BUDGET_S fills the budget. Configure replaces it."
+
 
 func _configure() -> void:
 	session.check( session.budget_s == 3.0, "constant" )

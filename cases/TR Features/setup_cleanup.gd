@@ -3,8 +3,6 @@ extends TR_Case
 
 ## Setup parents a node. The body uses it. Cleanup frees it.
 
-const DESCRIPTION: String = "Setup parents a node. The body uses it. Cleanup frees it."
-
 const NEEDS_TREE: bool = true
 
 
@@ -25,6 +23,10 @@ var _node: Node
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Setup parents a node. The body uses it. Cleanup frees it."
+
 
 func _setup() -> Error:
 	_node = Node.new()

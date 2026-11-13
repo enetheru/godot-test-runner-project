@@ -3,8 +3,6 @@ extends TR_Case
 
 ## Setup builds a detached tree. The body adds that tree's root.
 
-const DESCRIPTION: String = "Setup builds a detached tree. The body adds that tree's root."
-
 const NEEDS_TREE: bool = true
 
 # Scene callbacks. The call is the cost.
@@ -31,6 +29,10 @@ var _root: Node
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Setup builds a detached tree. The body adds that tree's root."
+
 
 func _setup() -> Error:
 	_root = _Callbacks.new()

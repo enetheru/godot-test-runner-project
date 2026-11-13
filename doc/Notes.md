@@ -1,15 +1,12 @@
 ## 2026-11-12
-- [ ] descriptions using a `{gdscript} const` for the description is a bad choice, we should use a virtual function
-- [ ] the test name and title should use a virtual function
-- [ ] The filename should be moved to the additional info expansion where the description also lives
+- infobox
+	- [x] The filename should be moved to the additional info expansion where the description also lives
+	- [x] Reasons a test failed do not show up in the output and infobox
+	- [ ] The TracyCapture hook should add a button or link to the card to open the trace file if it exists, or show that it is missing
 - [ ] The additional play executables should be configurable rather than hard coded, so we can any variants
 - [ ] TR_Case uses @tool, we want to build test cases that are not @tool scripts
-	- [ ] we either split the case script, or we ignore the warning.
-	- [ ] I tried a middle script that is empty and ignores the warning, but my experiment failed, my testing was not comprehensive though so there is probably more room for testing there.
-- [ ] Reasons a test failed do not show up in the output
+	- we either split the case script, or we ignore the warning.
+	- I tried a middle script that is empty and ignores the warning, but my experiment failed, my testing was not comprehensive though so there is probably more room for testing there.
 - [ ] Tests are arranged haphazardly
-- [ ] the TracyCapture hook should add a button or link to the card to open the trace file if it exists, or show that it is missing
 - [ ] hooks in general need to be expanded to be able to hook into more locations.
 - [ ] if the test case has options, show them in the inspector when the case is clicked
-- [ ] the hook options are stuck inside a small scroll area with an invalid heading
-- [ ] we can replace manual hook scripts with a hooks_dir in the discovery section of opts, we then add a checkbox for enable/disable for each discovered that would expose or hide their options in the dialog.

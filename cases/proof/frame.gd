@@ -3,8 +3,6 @@ extends TR_Case
 
 ## One frame on a scene tree. The script host refuses this before the body.
 
-const DESCRIPTION: String = "One frame on a scene tree. The script host refuses this before the body."
-
 const NEEDS_TREE := true
 
 
@@ -14,6 +12,10 @@ const NEEDS_TREE := true
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "One frame on a scene tree. The script host refuses this before the body."
+
 
 func _run_test() -> int:
 	var resumed := false

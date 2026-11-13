@@ -3,8 +3,6 @@ extends TR_Case
 
 ## Same body as the GDScript hierarchy test. The tree and the add_child live in SceneTreeAddHierarchy.
 
-const DESCRIPTION: String = "Same body as the GDScript hierarchy test. The tree and the add_child live in SceneTreeAddHierarchy."
-
 const NEEDS_TREE: bool = true
 
 # Expected node count, counting the root. The worker builds this many.
@@ -28,6 +26,10 @@ var _work: SceneTreeAddHierarchy
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Same body as the GDScript hierarchy test. The tree and the add_child live in SceneTreeAddHierarchy."
+
 
 func _setup() -> Error:
 	_work = SceneTreeAddHierarchy.new()

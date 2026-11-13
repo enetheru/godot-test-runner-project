@@ -3,15 +3,16 @@ extends TR_Case
 
 ## Passing checks. No tree.
 
-const DESCRIPTION: String = "Passing checks. No tree."
-
-
 #      ██████  ██    ██ ███████ ██████  ██████  ██ ██████  ███████ ███████     #
 #     ██    ██ ██    ██ ██      ██   ██ ██   ██ ██ ██   ██ ██      ██          #
 #     ██    ██ ██    ██ █████   ██████  ██████  ██ ██   ██ █████   ███████     #
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Passing checks. No tree."
+
 
 func _run_test() -> int:
 	session.check( true, "true" )

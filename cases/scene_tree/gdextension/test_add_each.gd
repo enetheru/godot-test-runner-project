@@ -3,8 +3,6 @@ extends TR_Case
 
 ## Same body as the GDScript add-each test. The nodes and the add_child loop live in SceneTreeAddEach.
 
-const DESCRIPTION: String = "Same body as the GDScript add-each test. The nodes and the add_child loop live in SceneTreeAddEach."
-
 const NEEDS_TREE: bool = true
 
 # Expected node count. The worker builds this many.
@@ -28,6 +26,10 @@ var _work: SceneTreeAddEach
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Same body as the GDScript add-each test. The nodes and the add_child loop live in SceneTreeAddEach."
+
 
 func _setup() -> Error:
 	_work = SceneTreeAddEach.new()

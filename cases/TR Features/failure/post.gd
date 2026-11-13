@@ -4,9 +4,6 @@ extends TR_Case
 ## The body passes. Post returns an error.
 ## The host reports fail.
 
-const DESCRIPTION: String = "The body passes. Post returns an error. The host reports fail."
-
-
 class Gate extends TR_Hook:
 	func _pre() -> Error:
 		return OK
@@ -22,6 +19,10 @@ class Gate extends TR_Hook:
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "The body passes. Post returns an error. The host reports fail."
+
 
 func _configure() -> void:
 	session.hooks.append( Gate.new() )

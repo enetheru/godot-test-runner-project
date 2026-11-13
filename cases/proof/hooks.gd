@@ -7,8 +7,6 @@ extends TR_Case
 ## is the value configure replaces.
 
 
-const DESCRIPTION: String = "Configure replaces the budget and installs hooks. Pre runs before the body. Post appends an output line. BUDGET_S is the value configure replaces."
-
 const BUDGET_S := 9.0
 
 
@@ -35,6 +33,10 @@ class Probe extends TR_Hook:
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _description() -> String:
+	return "Configure replaces the budget and installs hooks. Pre runs before the body. Post appends an output line. BUDGET_S is the value configure replaces."
+
 
 func _configure() -> void:
 	session.check( session.budget_s == 9.0, "constant" )

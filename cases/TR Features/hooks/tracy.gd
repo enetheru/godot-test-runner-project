@@ -7,8 +7,6 @@ extends TR_Case
 ## already hold one. Pre fails when the tools are missing, so the body only
 ## runs once the hook has settled.
 
-const DESCRIPTION:String = "Tracy on a scene tree. The script host refuses this before the body. Configure appends the capture hook when one is not already attached. The body checks that the capture hook is installed."
-
 const NEEDS_TREE:bool = true
 
 const TracyCapture = preload( "uid://c38qii7m273x0" )
@@ -20,6 +18,13 @@ const TracyCapture = preload( "uid://c38qii7m273x0" )
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+func _title() -> String:
+	return "Tracy Hook"
+
+func _description() -> String:
+	return "Tracy on a scene tree. The script host refuses this before the body. Configure appends the capture hook when one is not already attached. The body checks that the capture hook is installed."
+
 
 func _configure() -> void:
 	for hook: TR_Hook in session.hooks:
