@@ -1,0 +1,8 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" uid="uid://bt2m12i1dmpp4" path="res://cases/TR Features/strategy/failure_matrix/failure_matrix_opts.gd" id="1_opts"]
+
+[resource]
+script = ExtResource("1_opts")
+places = PackedStringArray("pre", "setup", "run", "cleanup", "post")
+triggers = PackedStringArray("retcode", "runcode_manual", "runcode_check")
