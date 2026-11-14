@@ -5,7 +5,7 @@ extends TR_StrategyScript
 ## The resource trims which pairs are asked for.
 
 
-const OPTS_PATH:String = "res://cases/TR Features/strategy/failure_matrix/failure_matrix.tres"
+const OPTS_PATH:String = "failure_matrix.tres"
 
 const PLACES:Array[String] = [
 	"config", "pre", "setup", "run", "cleanup", "post",

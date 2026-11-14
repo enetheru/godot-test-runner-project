@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://bpu2rq0p0nq4k"]
 
-[ext_resource type="Script" uid="uid://bt2m12i1dmpp4" path="res://cases/TR Features/strategy/failure_matrix/failure_matrix_opts.gd" id="1_opts"]
+[ext_resource type="Script" uid="uid://bt2m12i1dmpp4" path="res://cases/regression/failure/failure_matrix_opts.gd" id="1_opts"]
 
 [resource]
 script = ExtResource("1_opts")
