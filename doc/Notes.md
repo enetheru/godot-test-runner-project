@@ -1,8 +1,4 @@
 ## 2026-11-12
-- infobox
-	- [x] The filename should be moved to the additional info expansion where the description also lives
-	- [x] Reasons a test failed do not show up in the output and infobox
-	- [ ] The TracyCapture hook should add a button or link to the card to open the trace file if it exists, or show that it is missing
 - [ ] The additional play executables should be configurable rather than hard coded, so we can any variants
 - [ ] TR_Case uses @tool, we want to build test cases that are not @tool scripts
 	- we either split the case script, or we ignore the warning.
