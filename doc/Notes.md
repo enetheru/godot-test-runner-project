@@ -1,3 +1,7 @@
+# Notes
+
+Open work. A finished item leaves this file.
+
 ## 2026-11-12
 - [ ] The additional play executables should be configurable rather than hard coded, so we can any variants
 - [ ] TR_Case uses @tool, we want to build test cases that are not @tool scripts
