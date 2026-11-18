@@ -6,9 +6,6 @@ extends TR_Case
 
 const Drive = preload( "drive.gd" )
 
-# The planted timeout waits, and capture stays open for the whole case.
-const BUDGET_S: float = 20.0
-
 
 class Frame extends TR_Case:
 	const NEEDS_TREE: bool = true
@@ -44,11 +41,17 @@ class Owned extends TR_Case:
 
 class Budget extends TR_Case:
 	const NEEDS_TREE: bool = true
-	const BUDGET_S: float = 0.25
+
+	static func _static_init() -> void:
+		config.budget_s = 0.25
 
 	func _run_test() -> int:
 		await session.tree.create_timer( 0.75 ).timeout
 		return TR_CaseSession.TEST_OK
+
+
+static func _static_init() -> void:
+	config.budget_s = 20.0
 
 
 func _description() -> String:
@@ -56,13 +59,13 @@ func _description() -> String:
 
 
 func _run_test() -> int:
-	var frame_word: String = "refused"
-	var owned_word: String = "refused"
-	var budget_word: String = "refused"
+	var frame_word:Status = Status.REFUSED
+	var owned_word:Status = Status.REFUSED
+	var budget_word:Status = Status.REFUSED
 	if session.tree != null:
-		frame_word = "pass"
-		owned_word = "pass"
-		budget_word = "timeout"
+		frame_word = Status.PASS
+		owned_word = Status.PASS
+		budget_word = Status.TIMEOUT
 
 	await _watch( Frame.new(), frame_word )
 	await _watch( Owned.new(), owned_word )
@@ -70,6 +73,6 @@ func _run_test() -> int:
 	return session.runcode
 
 
-func _watch( body: TR_Case, expect: String ) -> void:
-	var got: String = await Drive.run( session, body )
-	session.check( got == expect, expect )
+func _watch( body: TR_Case, expect:Status ) -> void:
+	var got:int = await Drive.run( session, body )
+	session.check( got == expect, str(Status.find_key(expect)) )

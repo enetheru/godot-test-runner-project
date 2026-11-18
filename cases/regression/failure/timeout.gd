@@ -6,8 +6,6 @@ extends TR_Case
 
 const NEEDS_TREE: bool = true
 
-const BUDGET_S: float = 0.25
-
 
 #      ██████  ██    ██ ███████ ██████  ██████  ██ ██████  ███████ ███████     #
 #     ██    ██ ██    ██ ██      ██   ██ ██   ██ ██ ██   ██ ██      ██          #
@@ -15,6 +13,9 @@ const BUDGET_S: float = 0.25
 #     ██    ██  ██  ██  ██      ██   ██ ██   ██ ██ ██   ██ ██           ██     #
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
+
+static func _static_init() -> void:
+	config.budget_s = 0.25
 
 func _description() -> String:
 	return "The budget is shorter than the wait. The host reports timeout. The script host refuses this before the body."

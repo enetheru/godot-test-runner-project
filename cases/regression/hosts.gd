@@ -30,19 +30,19 @@ func _description() -> String:
 
 
 func _run_test() -> int:
-	var editor_word: String = "refused"
+	var editor_word:Status = Status.REFUSED
 	if session.hint and session.host == TR_CaseSession.Host.EDITOR:
-		editor_word = "pass"
+		editor_word = Status.PASS
 
-	var main_word: String = "refused"
+	var main_word:Status = Status.REFUSED
 	if session.tree != null and session.main_scene_started:
-		main_word = "pass"
+		main_word = Status.PASS
 
 	await _watch( EditorBody.new(), editor_word )
 	await _watch( MainBody.new(), main_word )
 	return session.runcode
 
 
-func _watch( body: TR_Case, expect: String ) -> void:
-	var got: String = await Drive.run( session, body )
-	session.check( got == expect, expect )
+func _watch( body: TR_Case, expect:Status ) -> void:
+	var got:int = await Drive.run( session, body )
+	session.check( got == expect, str(Status.find_key(expect))  )

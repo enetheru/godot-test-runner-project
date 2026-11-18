@@ -3,12 +3,8 @@ extends TR_Case
 
 ## Configure replaces the budget and installs hooks.
 ##
-## Pre runs before the body. Post appends an output line. [code]BUDGET_S[/code]
+## Pre runs before the body. Post appends an output line. [code]budget_s[/code]
 ## is the value configure replaces.
-
-
-const BUDGET_S := 9.0
-
 
 class Probe extends TR_Hook:
 	var saw_pre: bool = false
@@ -34,8 +30,12 @@ class Probe extends TR_Hook:
 #      ██████    ████   ███████ ██   ██ ██   ██ ██ ██████  ███████ ███████     #
 func                        ________OVERRIDES________              ()->void:pass
 
+static func _static_init() -> void:
+	config.budget_s = 9.0
+
+
 func _description() -> String:
-	return "Configure replaces the budget and installs hooks. Pre runs before the body. Post appends an output line. BUDGET_S is the value configure replaces."
+	return "Configure replaces the budget and installs hooks. Pre runs before the body. Post appends an output line. budget_s is the value configure replaces."
 
 
 func _configure() -> void:

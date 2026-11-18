@@ -6,9 +6,8 @@ extends TR_Case
 
 const Drive = preload( "drive.gd" )
 
-const BUDGET_S: float = 3.0
 
-
+@abstract
 class Plant extends TR_Case:
 	var body_ran: bool = false
 
@@ -74,6 +73,8 @@ class CheckFault extends Plant:
 		session.check( 1 == 2, "one equals two" )
 		return TR_CaseSession.TEST_OK
 
+static func _static_init() -> void:
+	config.budget_s = 3.0
 
 func _description() -> String:
 	return "Configure can replace the budget. A planted fault reports its own status, and the body of a failed setup or pre does not run."
@@ -86,17 +87,17 @@ func _configure() -> void:
 
 func _run_test() -> int:
 	session.check( session.budget_s == 4.0, "budget replaced" )
-	await _watch( SetupFault.new(), "setup failed", true )
-	await _watch( CleanupFault.new(), "cleanup failed", false )
-	await _watch( PreFault.new(), "fail", true )
-	await _watch( PostFault.new(), "fail", false )
-	await _watch( ReturnFault.new(), "fail", false )
-	await _watch( CheckFault.new(), "fail", false )
+	await _watch( SetupFault.new(), Status.SETUP_FAILED, true )
+	await _watch( CleanupFault.new(), Status.CLEANUP_FAILED, false )
+	await _watch( PreFault.new(), Status.FAIL, true )
+	await _watch( PostFault.new(), Status.FAIL, false )
+	await _watch( ReturnFault.new(), Status.FAIL, false )
+	await _watch( CheckFault.new(), Status.FAIL, false )
 	return session.runcode
 
 
-func _watch( plant: Plant, expect: String, skip_body: bool ) -> void:
-	var got: String = await Drive.run( session, plant )
-	session.check( got == expect, expect )
+func _watch( plant: Plant, expect:Status, skip_body: bool ) -> void:
+	var got:int = await Drive.run( session, plant )
+	session.check( got == expect, str(Status.find_key(expect)) )
 	if skip_body:
-		session.check( not plant.body_ran, expect + " skipped the body" )
+		session.check( not plant.body_ran, str(Status.find_key(expect)) + " skipped the body" )

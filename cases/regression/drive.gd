@@ -4,7 +4,7 @@ extends RefCounted
 ## The caller stays a passing case.
 
 
-static func run( outer:TR_CaseSession, body:TR_Case ) -> String:
+static func run( outer:TR_CaseSession, body:TR_Case ) -> int:
 	var inner := TR_CaseSession.new()
 	inner.host = outer.host
 	inner.case_path = outer.case_path
