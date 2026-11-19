@@ -38,19 +38,20 @@ enabled=PackedStringArray("res://addons/enetheru.command-server/plugin.cfg", "re
 
 [plugin]
 
-test_runner/Logging/lvl=127
+test_runner/Logging/lvl=0
 test_runner/Discovery/cases_dirs=PackedStringArray("res://cases/")
 test_runner/Hooks/hook_dirs=PackedStringArray("res://addons/enetheru.test-runner/runner/hooks")
 test_runner/hooks/tracy/Tracy/enabled=true
 test_runner/hooks/tracy/Tracy/python_exe="C:/Users/nicho/AppData/Local/Programs/Python/Python314/python.exe"
-test_runner/hooks/tracy/Tracy/Capture/exe="C:/git/wolfpld/tracy/capture/cmake-build-release-visual-studio/tracy-capture.exe"
+test_runner/hooks/tracy/Tracy/Capture/exe="C:/git/wolfpld/tracy/capture/cmake-build-release-visual-studio/Release/tracy-capture.exe"
 test_runner/hooks/tracy/Tracy/Capture/scripts="C:/Godot/src/godot-private/misc/scripts/tracy"
-test_runner/hooks/tracy/Tracy/Capture/Pad/s=0.05994803212906359
+test_runner/hooks/tracy/Tracy/Capture/Pad/s=0.08097167667377034
 test_runner/hooks/tracy/Tracy/Capture/Pad/samples=32
 test_runner/Play/Templates/debug="C:/Godot/Projects/Enetheru.test-runner-project/godot.windows.template_debug.x86_64.llvm.tracy.exe"
 test_runner/Play/Templates/release="C:/Godot/Projects/Enetheru.test-runner-project/godot.windows.template_release.x86_64.llvm.tracy.exe"
-test_runner/tree_folded=PackedStringArray("res://cases/TR Features/failure")
-test_runner/split_offset=236
+test_runner/tree_folded=PackedStringArray("res://cases/regression/failure")
+test_runner/split_offset=259
 test_runner/hooks/tracy/Tracy/Timing/=3.0
-test_runner/hooks/tracy/Tracy/Record/=8191
+test_runner/hooks/tracy/Tracy/Record/=1023
 test_runner/Discovery/hook_dirs=PackedStringArray("res://addons/enetheru.test-runner/runner/hooks")
+test_runner/hooks/tracy/Tracy/Capture/crop=true
