@@ -2,7 +2,7 @@
 
 Look up the thing you are writing. The heading is the situation. The paragraph is that situation, then the result the host reports.
 
-The note pairs with [case.md](case.md). A harness change holds when every paragraph still comes out as written. A change that moves a paragraph is an edit here first. The status words are pass, fail, timeout, refused, setup failed, and cleanup failed.
+The note pairs with [case.md](case.md). A harness change holds when every paragraph still comes out as written. A change that moves a paragraph is an edit here first. The status is `TR_CaseSession.Status`, described in case.md.
 
 Several of the failure results are also one row, generated when that row runs. That schedule is [strategy.md](strategy.md). The files named below stay until that row replaces them, and the replacement edits the paragraph first.
 

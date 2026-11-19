@@ -34,7 +34,7 @@ A click on one case skips the strategy layer. A folder that holds one case is a 
 
 The starter looks at the row. A case calls the case session. A strategy script calls a strategy session. A folder calls a strategy session whose children are the discovered scripts. A `res://` directory on the command line or in `CASE_PATHS` is kept, so the session receives the folder.
 
-The strategy session walks its children. A case child gets a case session. A strategy child gets the same walk again. The host is the button the user pressed, and a nested strategy inherits it. One play of a strategy is one game. Each child inside that game is still its own case session. The editor and the script host run the walk in that process.
+The strategy session walks its children. A case child gets a case session. A strategy child gets the same walk again. The host is the button the user pressed, and a nested strategy inherits it. One play of a strategy is one game. Each child inside that game is still its own case session, with its own hooks. The editor and the script host run the walk in that process. A child that declares `OWN_PROCESS` stays in that process. The launcher only splits paths it was given.
 
 The walk keeps the paths it has already entered. A strategy that names an ancestor is refused. The folder strategy is not a file in the folder, so a folder run does not find itself and start again.
 

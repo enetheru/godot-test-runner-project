@@ -10,7 +10,7 @@ The old `TestBase` runner is gone. A case does not extend `EditorScript`, `Node`
   The body. Configure, pre, setup, the run, cleanup, and post. A GDScript case extends `TR_Case`. The case awaits signals on the host's tree when that host has one.
 
 **Session**
-  `TR_CaseSession`. It owns the status word, `runcode`, the output, and the hooks. Every host uses the same session.
+  `TR_CaseSession`. It runs the case and owns the hooks. `TR_Result` is the record every host passes on: status, `runcode`, host, flavour, hint, reason, path, the log lines, and an `extra` dictionary.
 
 **Clock**
   How the session notices time. A tree host uses a timer on a root. The script host uses the iterations of its main loop. The case does not build the clock.
@@ -61,11 +61,17 @@ Play starts the player scene. That scene attaches the tree clock to the game roo
 
 The script host points `-s` at the runner's main loop. That loop attaches the loop clock and runs what it was given. A case marked `NEEDS_TREE` is refused before the body. A case that only checks values can run.
 
+Play and the script host run the paths they are given in one executable. Each path still gets its own session. That session loads its own hooks, runs pre, then setup, the body, and cleanup, then post.
+
+A case sets `OWN_PROCESS` when it wants a fresh executable. Absent means share. The editor host is this editor, so the constant changes nothing there. A folder or a strategy is one walk inside the executable that started it, and a child that sets `OWN_PROCESS` stays in that walk.
+
+When a shared executable stops before every path has reported, the launcher runs the first silent path on its own and then continues with the paths that never started.
+
 A strategy or a folder is a strategy session. That walk is [strategy.md](strategy.md). A single case does not go through it.
 
 ## Result
 
-The status words are `pass`, `fail`, `timeout`, `refused`, `setup failed`, and `cleanup failed`.
+The status is `TR_CaseSession.Status`. `OK` and `FAILED` are the labels for pass and fail. The other labels are the enum names: `TIMEOUT`, `REFUSED`, `SETUP_FAILED`, and `CLEANUP_FAILED`.
 
 `TEST_OK` is 1 and `TEST_FAILED` is 0. Setup and cleanup return `Error`, so their success is 0. The body returns the session's `runcode`. A comparison that fails leaves that code failed even when the body returns pass.
 
