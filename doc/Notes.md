@@ -10,7 +10,5 @@ Open work. A finished item leaves this file.
 - [ ] Tests are arranged haphazardly
 - [ ] hooks in general need to be expanded to be able to hook into more locations.
 - [ ] if the test case has options, show them in the inspector when the case is clicked
-## 2026-11-18
-- [ ] loads of places where strict contract conventions can be used in the function calls, there is so much useless error checking after the fact.
 ## 2026-11-20
 - [ ] When running a test, the editor becomes unresponsive.

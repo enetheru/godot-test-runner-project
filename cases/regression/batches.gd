@@ -12,10 +12,7 @@ func _run_test() -> int:
 	var share:String = "res://cases/regression/values.gd"
 	var own:String = "res://cases/regression/own_process.gd"
 	var folder:String = "res://cases/regression"
-	var paths:PackedStringArray = PackedStringArray()
-	if paths.append( share ) or paths.append( own ) or paths.append( share ) or paths.append( folder ):
-		push_error( "batches._run_test: append failed" )
-		return session.runcode
+	var paths:PackedStringArray = PackedStringArray( [ share, own, share, folder ] )
 
 	var batches:Array[PackedStringArray] = TR_CaseSession.launch_batches( paths )
 	session.check( batches.size() == 3, "three launches" )
