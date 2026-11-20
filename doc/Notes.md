@@ -11,4 +11,4 @@ Open work. A finished item leaves this file.
 - [ ] hooks in general need to be expanded to be able to hook into more locations.
 - [ ] if the test case has options, show them in the inspector when the case is clicked
 ## 2026-11-20
-- [ ] When running a test, the editor becomes unresponsive.
+- [ ] Play Editor still runs the case on the editor thread, so a case that does not return to the main loop stalls the UI.
