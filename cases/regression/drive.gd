@@ -14,5 +14,10 @@ static func run( outer:TR_CaseSession, body:TR_Case ) -> int:
 	else:
 		inner.attach_loop()
 
-	await inner.run_await( body )
+	var turn := TR_StrategySession.Turn.new()
+	turn.host = outer.host
+	turn.tree = outer.tree
+	turn.add_body( inner, body )
+	turn.arm()
+	await turn.idle
 	return inner.status
